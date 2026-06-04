@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body {
+        font-family: Arial;
+        color: #111827;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #991b1b;
+    }
+
+    .info {
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+    .resumo {
+        background: #fee2e2;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 600px;
+    }
+
+    th {
+        background: #7f1d1d;
+        color: white;
+        padding: 8px;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid #cbd5e1;
+        padding: 8px;
+    }
+
+    .valor {
+        color: #b91c1c;
+        font-weight: bold;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .info {
+            font-size: 12px;
+        }
+
+        .resumo {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        th,
+        td {
+            padding: 6px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Relatório de Inadimplência</h1>
+
+<div class="info">
+    Sistema: IvanTech<br>
+    Gerado em: {{ data_geracao|date:"d/m/Y H:i" }}
+</div>
+
+<div class="resumo">
+    <strong>Total atrasado:</strong> R$ {{ total_atrasado|floatformat:2 }}<br>
+    <strong>Parcelas atrasadas:</strong> {{ total_parcelas }}
+</div>
+
+<table>
+    <tr>
+        <th>Cliente</th>
+        <th>Telefone</th>
+        <th>Venda</th>
+        <th>Parcela</th>
+        <th>Vencimento</th>
+        <th>Valor</th>
+    </tr>
+
+    {% for p in parcelas %}
+    <tr>
+        <td>{{ p.venda.cliente.nome }}</td>
+        <td>{{ p.venda.cliente.telefone }}</td>
+        <td>#{{ p.venda.id }}</td>
+        <td>{{ p.numero }}</td>
+        <td>{{ p.vencimento|date:"d/m/Y" }}</td>
+        <td class="valor">R$ {{ p.valor|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

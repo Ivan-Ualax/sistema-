@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Despesas</title>
+
+    <style>
+    body {
+        background: #0f172a;
+        font-family: Arial;
+        color: white;
+        padding: 30px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn {
+        background: #ef4444;
+        padding: 10px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        display: inline-block;
+    }
+
+    .card-total {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        border: 1px solid #334155;
+        width: 250px;
+        box-sizing: border-box;
+    }
+
+    .card-total h3 {
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .card-total p {
+        font-size: 24px;
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 25px;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 10px;
+        overflow: hidden;
+        min-width: 700px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #334155;
+        text-align: left;
+    }
+
+    th {
+        background: #020617;
+        color: #94a3b8;
+    }
+
+    .fixa {
+        color: #38bdf8;
+        font-weight: bold;
+    }
+
+    .variavel {
+        color: #f59e0b;
+        font-weight: bold;
+    }
+
+    .deletar {
+        color: #ef4444;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .voltar {
+        display: inline-block;
+        margin-top: 20px;
+        border: 1px solid #334155;
+        padding: 8px 15px;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .voltar:hover {
+        background: #1e293b;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .card-total {
+            width: 100%;
+        }
+
+        .card-total p {
+            font-size: 22px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .voltar {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h2>💸 Despesas</h2>
+    <a href="/despesas/add/" class="btn">+ Nova Despesa</a>
+</div>
+
+<div class="card-total">
+    <h3>Total de Despesas</h3>
+    <p>R$ {{ total_despesas|floatformat:2 }}</p>
+</div>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Categoria</th>
+        <th>Valor</th>
+        <th>Data</th>
+        <th>Observação</th>
+        <th>Ação</th>
+    </tr>
+
+    {% for d in despesas %}
+    <tr>
+        <td>{{ d.id }}</td>
+        <td>{{ d.nome }}</td>
+
+        <td>
+            {% if d.categoria == 'fixa' %}
+                <span class="fixa">Fixa</span>
+            {% else %}
+                <span class="variavel">Variável</span>
+            {% endif %}
+        </td>
+
+        <td>R$ {{ d.valor|floatformat:2 }}</td>
+        <td>{{ d.data }}</td>
+
+        <td>
+            {% if d.observacao %}
+                {{ d.observacao }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        <td>
+            <a href="/despesas/deletar/{{ d.id }}/" class="deletar">Excluir</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">Nenhuma despesa cadastrada.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/" class="voltar">← Voltar</a>
+
+</body>
+</html>

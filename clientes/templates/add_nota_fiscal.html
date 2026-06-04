@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nova Nota Fiscal</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 650px;
+        background: #1e293b;
+        padding: 35px;
+        border-radius: 20px;
+        border: 1px solid #334155;
+        box-shadow: 0 0 30px rgba(0,0,0,0.4);
+        box-sizing: border-box;
+    }
+
+    h1 {
+        margin-top: 0;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #cbd5e1;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid #334155;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+        outline: none;
+        font-size: 15px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 10px rgba(37,99,235,0.3);
+    }
+
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #2563eb, #3b82f6);
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    button:hover {
+        background: linear-gradient(90deg, #1d4ed8, #2563eb);
+    }
+
+    .voltar {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        background: #334155;
+        color: white;
+        text-decoration: none;
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .voltar:hover {
+        background: #475569;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+        }
+
+        button,
+        .voltar {
+            font-size: 16px;
+            padding: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>🧾 Nova Nota Fiscal</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Número da Nota</label>
+            <input type="text" name="numero" required>
+        </div>
+
+        <div class="form-group">
+            <label>Chave de Acesso</label>
+            <input type="text" name="chave_acesso">
+        </div>
+
+        <div class="form-group">
+            <label>Cliente</label>
+
+            <select name="cliente">
+                <option value="">Selecione</option>
+
+                {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">
+                        {{ cliente.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Venda Vinculada</label>
+
+            <select name="venda">
+                <option value="">Selecione</option>
+
+                {% for venda in vendas %}
+                    <option value="{{ venda.id }}">
+                        Venda #{{ venda.id }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo</label>
+
+            <select name="tipo">
+                <option value="saida">Saída</option>
+                <option value="entrada">Entrada</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+
+            <select name="status">
+                <option value="pendente">Pendente</option>
+                <option value="emitida">Emitida</option>
+                <option value="cancelada">Cancelada</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Valor Total</label>
+            <input type="text" name="valor_total">
+        </div>
+
+        <div class="form-group">
+            <label>Observação</label>
+
+            <textarea name="observacao"></textarea>
+        </div>
+
+        <button type="submit">
+            💾 Salvar Nota Fiscal
+        </button>
+    </form>
+
+    <a href="/notas-fiscais/" class="voltar">
+        ← Voltar
+    </a>
+
+</div>
+
+</body>
+</html>

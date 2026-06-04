@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nova Venda</title>
+
+    <style>
+    body {
+        background: #0f172a;
+        font-family: Arial;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 12px;
+        width: 400px;
+        box-sizing: border-box;
+    }
+
+    label {
+        display: block;
+        margin-top: 10px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        color: white;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    .checkbox-area {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .checkbox-area input {
+        width: auto;
+    }
+
+    .parcelas-box {
+        margin-top: 10px;
+        padding: 12px;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        background: #0f172a;
+        box-sizing: border-box;
+    }
+
+    .resultado {
+        margin-top: 15px;
+        background: #020617;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 12px;
+        color: #cbd5e1;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .resultado strong {
+        color: #22c55e;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background: #22c55e;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .voltar {
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+        border: 1px solid #334155;
+        padding: 8px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+            align-items: flex-start;
+        }
+
+        .card {
+            width: 100%;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: 16px;
+        }
+
+        .resultado {
+            font-size: 13px;
+        }
+
+        .checkbox-area {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Nova Venda</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Cliente</label>
+        <select name="cliente" required>
+            {% for c in clientes %}
+                <option value="{{ c.id }}">{{ c.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Produto</label>
+        <select name="produto" id="produto" required>
+            {% for p in produtos %}
+                <option value="{{ p.id }}" data-preco="{{ p.preco_venda }}">
+                    {{ p.nome }} - R$ {{ p.preco_venda }} (Estoque: {{ p.quantidade }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Quantidade</label>
+        <input type="number" name="quantidade" id="quantidade" min="1" value="1" required>
+
+        <div class="checkbox-area">
+            <input type="checkbox" name="parcelado" id="parcelado">
+            <label for="parcelado" style="margin:0;">Venda parcelada</label>
+        </div>
+
+        <div class="parcelas-box">
+            <label>Quantidade de parcelas</label>
+            <input type="number" name="quantidade_parcelas" id="quantidade_parcelas" min="1" value="1">
+
+            <label>Juros ao mês (%)</label>
+            <input type="text" name="juros_percentual" id="juros_percentual" placeholder="Ex: 10">
+        </div>
+
+        <div class="resultado">
+            <p>Total sem juros: <strong id="total_sem_juros">R$ 0,00</strong></p>
+            <p>Total com juros: <strong id="total_com_juros">R$ 0,00</strong></p>
+            <p>Valor da parcela: <strong id="valor_parcela">R$ 0,00</strong></p>
+        </div>
+
+        <button type="submit">Finalizar Venda</button>
+    </form>
+
+    <a href="/vendas/" class="voltar">Voltar</a>
+</div>
+
+<script>
+function converterNumero(valor) {
+    return parseFloat(String(valor).replace(',', '.')) || 0;
+}
+
+function formatarMoeda(valor) {
+    return valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
+function calcularVenda() {
+    const produto = document.getElementById('produto');
+    const preco = converterNumero(produto.options[produto.selectedIndex].dataset.preco);
+    const quantidade = converterNumero(document.getElementById('quantidade').value);
+    const parcelado = document.getElementById('parcelado').checked;
+    const parcelas = converterNumero(document.getElementById('quantidade_parcelas').value) || 1;
+    const juros = converterNumero(document.getElementById('juros_percentual').value);
+
+    const totalSemJuros = preco * quantidade;
+
+    let totalComJuros = totalSemJuros;
+    let valorParcela = totalSemJuros;
+
+    if (parcelado) {
+        const taxa = juros / 100;
+        totalComJuros = totalSemJuros + (totalSemJuros * taxa * parcelas);
+        valorParcela = totalComJuros / parcelas;
+    }
+
+    document.getElementById('total_sem_juros').innerText = formatarMoeda(totalSemJuros);
+    document.getElementById('total_com_juros').innerText = formatarMoeda(totalComJuros);
+    document.getElementById('valor_parcela').innerText = formatarMoeda(valorParcela);
+}
+
+document.getElementById('produto').addEventListener('change', calcularVenda);
+document.getElementById('quantidade').addEventListener('input', calcularVenda);
+document.getElementById('parcelado').addEventListener('change', calcularVenda);
+document.getElementById('quantidade_parcelas').addEventListener('input', calcularVenda);
+document.getElementById('juros_percentual').addEventListener('input', calcularVenda);
+
+calcularVenda();
+</script>
+
+</body>
+</html>

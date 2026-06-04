@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Cliente</title>
+
+    <style>
+
+    body{
+        margin:0;
+        padding:30px 15px;
+        font-family:Arial;
+        background:#0f172a;
+        color:white;
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        min-height:100vh;
+        box-sizing:border-box;
+    }
+
+    .card{
+        width:100%;
+        max-width:520px;
+        background:#1e293b;
+        padding:30px;
+        border-radius:22px;
+        border:1px solid #334155;
+        box-shadow:0 0 35px rgba(0,0,0,0.35);
+        box-sizing:border-box;
+    }
+
+    h1{
+        text-align:center;
+        font-size:30px;
+        margin-bottom:30px;
+    }
+
+    label{
+        display:block;
+        margin-top:22px;
+        margin-bottom:10px;
+        font-size:15px;
+        color:#cbd5e1;
+        font-weight:bold;
+    }
+
+    input,
+    select,
+    textarea{
+        width:100%;
+        padding:14px;
+        border-radius:14px;
+        border:1px solid #334155;
+        background:#020617;
+        color:white;
+        font-size:15px;
+        box-sizing:border-box;
+        outline:none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+        border-color:#2563eb;
+        box-shadow:0 0 10px rgba(37,99,235,0.35);
+    }
+
+    textarea{
+        min-height:160px;
+        resize:vertical;
+        line-height:1.5;
+    }
+
+    .status-box{
+        margin-top:20px;
+    }
+
+    button{
+        width:100%;
+        margin-top:30px;
+        padding:16px;
+        border:none;
+        border-radius:14px;
+        background:linear-gradient(90deg,#2563eb,#3b82f6);
+        color:white;
+        font-size:17px;
+        font-weight:bold;
+        cursor:pointer;
+        transition:0.2s;
+    }
+
+    button:hover{
+        transform:translateY(-2px);
+        background:linear-gradient(90deg,#1d4ed8,#2563eb);
+    }
+
+    .voltar{
+        display:block;
+        text-align:center;
+        margin-top:16px;
+        padding:15px;
+        border-radius:14px;
+        background:#334155;
+        color:white;
+        text-decoration:none;
+        font-size:15px;
+        box-sizing:border-box;
+    }
+
+    .voltar:hover{
+        background:#475569;
+    }
+
+    .erro{
+        background:#7f1d1d;
+        color:white;
+        padding:14px;
+        border-radius:12px;
+        margin-bottom:20px;
+        border:1px solid #ef4444;
+        font-size:14px;
+        font-weight:bold;
+        box-sizing:border-box;
+    }
+
+    /* RESPONSIVO */
+
+    @media(max-width:600px){
+
+        body{
+            padding:15px;
+        }
+
+        .card{
+            padding:22px;
+            border-radius:18px;
+        }
+
+        h1{
+            font-size:24px;
+            margin-bottom:24px;
+        }
+
+        label{
+            font-size:14px;
+            margin-top:18px;
+        }
+
+        input,
+        select,
+        textarea{
+            font-size:16px;
+            padding:13px;
+        }
+
+        textarea{
+            min-height:130px;
+        }
+
+        button,
+        .voltar{
+            font-size:15px;
+            padding:14px;
+        }
+
+        .erro{
+            font-size:13px;
+            padding:12px;
+        }
+
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>👤 Editar Cliente</h1>
+
+    {% if erro %}
+        <div class="erro">
+            {{ erro }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <label>Nome</label>
+
+        <input
+            type="text"
+            name="nome"
+            value="{{ cliente.nome }}"
+            placeholder="Digite o nome do cliente"
+            required
+        >
+
+        <label>CPF</label>
+
+        <input
+            type="text"
+            name="cpf"
+            value="{{ cliente.cpf }}"
+            placeholder="00000000000"
+            maxlength="11"
+            pattern="[0-9]+"
+            inputmode="numeric"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            required
+        >
+        
+        <label>Telefone</label>
+
+        <input
+            type="text"
+            name="telefone"
+            value="{{ cliente.telefone }}"
+            placeholder="(00) 00000-0000"
+            required
+        >
+
+        <label>Localização / Endereço (opcional)</label>
+
+        <textarea
+            name="localizacao"
+            placeholder="Digite a localização ou endereço completo do cliente..."
+        >{{ cliente.localizacao }}</textarea>
+
+        <div class="status-box">
+
+            <label>Status</label>
+
+            <select name="status">
+
+                <option
+                    value="True"
+                    {% if cliente.status %}
+                        selected
+                    {% endif %}
+                >
+                    🟢 Ativo
+                </option>
+
+                <option
+                    value="False"
+                    {% if not cliente.status %}
+                        selected
+                    {% endif %}
+                >
+                    🔴 Inativo
+                </option>
+
+            </select>
+
+        </div>
+
+        <button type="submit">
+            💾 Salvar Alterações
+        </button>
+
+    </form>
+
+    <a href="/clientes/" class="voltar">
+        ← Voltar para clientes
+    </a>
+
+</div>
+
+</body>
+</html>

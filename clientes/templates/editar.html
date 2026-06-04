@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar</title>
+
+   <style>
+    body {
+        background: #0f172a;
+        color: white;
+        font-family: Arial;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 10px;
+        width: 300px;
+        box-sizing: border-box;
+    }
+
+    input {
+        width: 90%;
+        padding: 10px;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+
+    select {
+        width: 98%;
+        padding: 10px;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+
+    button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+        background: #22c55e;
+        border: none;
+        color: white;
+        cursor: pointer;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+            align-items: flex-start;
+        }
+
+        .card {
+            width: 100%;
+            padding: 22px;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px;
+        }
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Editar Cliente</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input name="nome" value="{{ cliente.nome }}">
+    <input name="cpf" value="{{ cliente.cpf }}">
+    <input name="telefone" value="{{ cliente.telefone }}">
+
+    <select name="status">
+        <option value="True" {% if cliente.status %}selected{% endif %}>Ativo  🟢</option>
+        <option value="False" {% if not cliente.status %}selected{% endif %}>Inativo  🔴</option>
+    </select>
+
+    <button>Salvar</button>
+</form>
+
+</div>
+
+   
+
+
+</body>
+</html>

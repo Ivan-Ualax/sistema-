@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notas Fiscais</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+    }
+
+    .sidebar {
+        width: 240px;
+        min-height: 100vh;
+        background: #020617;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 30px;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 30px;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        background: #2563eb;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .btn:hover {
+        background: #1d4ed8;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 12px;
+        overflow: hidden;
+        min-width: 750px;
+    }
+
+    th {
+        background: #020617;
+        padding: 14px;
+        text-align: left;
+        color: #cbd5e1;
+    }
+
+    td {
+        padding: 14px;
+        border-top: 1px solid #334155;
+    }
+
+    tr:hover {
+        background: #273449;
+    }
+
+    .emitida {
+        color: #22c55e;
+        font-weight: bold;
+    }
+
+    .cancelada {
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    .pendente {
+        color: #facc15;
+        font-weight: bold;
+    }
+
+    .acoes a {
+        color: #38bdf8;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+    .acoes a:hover {
+        text-decoration: underline;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            min-height: auto;
+            padding: 15px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .acoes a {
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>💻 IvanTech</h2>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/clientes/">👥 Clientes</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+    <a href="/financeiro/">💰 Financeiro</a>
+    <a href="/notas-fiscais/">🧾 Notas Fiscais</a>
+</div>
+
+<div class="content">
+
+    <div class="topo">
+        <div>
+            <h1>🧾 Notas Fiscais</h1>
+            <p style="color:#94a3b8;">
+                Controle e lançamento de notas fiscais
+            </p>
+        </div>
+
+        <a href="/notas-fiscais/add/" class="btn">
+            + Nova Nota
+        </a>
+    </div>
+
+    <table>
+
+        <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Valor</th>
+            <th>Data</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for nota in notas %}
+
+        <tr>
+            <td>{{ nota.numero }}</td>
+
+            <td>
+                {% if nota.cliente %}
+                    {{ nota.cliente.nome }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+
+            <td>{{ nota.get_tipo_display }}</td>
+
+            <td>
+                <span class="{{ nota.status }}">
+                    {{ nota.get_status_display }}
+                </span>
+            </td>
+
+            <td>R$ {{ nota.valor_total }}</td>
+
+            <td>{{ nota.data_emissao|date:"d/m/Y" }}</td>
+
+            <td class="acoes">
+                <a href="/notas-fiscais/deletar/{{ nota.id }}/">
+                    Excluir
+                </a>
+            </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+            <td colspan="7">
+                Nenhuma nota fiscal cadastrada.
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+</html>

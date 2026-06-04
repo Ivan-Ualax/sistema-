@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Compra</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 12px;
+        width: 380px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        color: #cbd5e1;
+        font-size: 14px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 6px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px;
+        background: #2563eb;
+        border: none;
+        color: white;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    a {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+            align-items: flex-start;
+        }
+
+        .card {
+            width: 100%;
+            padding: 22px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: 16px;
+        }
+
+        button {
+            padding: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Editar Compra</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Produto</label>
+        <input type="text" value="{{ compra.produto.nome }}" disabled>
+
+        <label>Fornecedor</label>
+
+        <select name="fornecedor">
+            <option value="">Selecione um fornecedor</option>
+
+            {% for fornecedor in fornecedores %}
+                <option value="{{ fornecedor.id }}"
+                    {% if compra.fornecedor_cadastro and compra.fornecedor_cadastro.id == fornecedor.id %}
+                        selected
+                    {% endif %}
+                >
+                    {{ fornecedor.nome }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Quantidade</label>
+        <input type="number" name="quantidade" value="{{ compra.quantidade }}" required>
+
+        <label>Preço de compra</label>
+        <input type="text" name="preco" value="{{ compra.preco }}" required>
+
+        <label>Preço de revenda</label>
+        <input type="text" name="preco_venda" value="{{ compra.preco_venda }}" required>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <a href="/compras/">Voltar</a>
+</div>
+
+</body>
+</html>

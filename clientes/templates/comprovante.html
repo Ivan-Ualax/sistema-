@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprovante</title>
+
+    <style>
+    body {
+        font-family: Arial;
+        background: #fff;
+        color: #000;
+        padding: 40px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .container {
+        width: 600px;
+        margin: auto;
+        border: 1px solid #000;
+        padding: 25px;
+        box-sizing: border-box;
+    }
+
+    .topo {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .topo h2 {
+        margin: 0;
+    }
+
+    .linha {
+        border-bottom: 1px solid #000;
+        margin: 15px 0;
+        padding-bottom: 5px;
+    }
+
+    .campo {
+        margin-top: 10px;
+    }
+
+    .campo span {
+        font-weight: bold;
+    }
+
+    .duas-colunas {
+        display: flex;
+        gap: 20px;
+    }
+
+    .col {
+        flex: 1;
+    }
+
+    .area-escrita {
+        border-bottom: 1px solid #000;
+        height: 20px;
+        margin-top: 5px;
+    }
+
+    .assinatura {
+        margin-top: 40px;
+    }
+
+    .rodape {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .btn {
+        margin-top: 30px;
+        padding: 10px 15px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .container {
+            width: 100%;
+            padding: 18px;
+        }
+
+        .topo h2 {
+            font-size: 22px;
+        }
+
+        .duas-colunas {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .campo {
+            font-size: 14px;
+        }
+
+        .rodape {
+            font-size: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            font-size: 15px;
+            padding: 12px;
+        }
+    }
+
+    @media print {
+        .btn {
+            display: none;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topo">
+        <h2>COMPROVANTE DE PAGAMENTO</h2>
+        <p>IvanTech - Sistema de Gestão Empresarial</p>
+    </div>
+
+    <div class="linha"></div>
+
+    <!-- DADOS AUTOMÁTICOS -->
+    <div class="campo">
+        <span>Cliente:</span> {{ parcela.venda.cliente.nome }}
+    </div>
+
+    <div class="campo">
+        <span>CPF:</span> {{ parcela.venda.cliente.cpf|default:"Não informado" }}
+    </div>
+
+    <div class="campo">
+        <span>Venda:</span> #{{ parcela.venda.id }}
+    </div>
+
+    <div class="duas-colunas">
+        <div class="col campo">
+            <span>Parcela:</span> {{ parcela.numero }}
+        </div>
+
+        <div class="col campo">
+            <span>Valor:</span> R$ {{ parcela.valor|floatformat:2 }}
+        </div>
+    </div>
+
+    <div class="campo">
+        <span>Data do pagamento:</span> {{ parcela.data_pagamento }}
+    </div>
+
+    <div class="linha"></div>
+
+    <!-- CAMPOS PARA PREENCHIMENTO MANUAL -->
+    <div class="campo">
+        <span>Endereço:</span>
+        <div class="area-escrita"></div>
+    </div>
+
+    <div class="campo">
+        <span>Telefone:</span>
+        <div class="area-escrita"></div>
+    </div>
+
+    <div class="campo">
+        <span>Observações:</span>
+        <div class="area-escrita"></div>
+        <div class="area-escrita"></div>
+        <div class="area-escrita"></div>
+    </div>
+
+    <div class="assinatura">
+        <div class="area-escrita"></div>
+        <p style="text-align:center;">Assinatura</p>
+    </div>
+
+    <div class="rodape">
+        <p>Documento gerado pelo sistema IvanTech</p>
+    </div>
+
+</div>
+
+<button class="btn" onclick="window.print()">Imprimir</button>
+
+</body>
+</html>

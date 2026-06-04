@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nova Compra</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+    }
+
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: #020617;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 12px;
+        width: 400px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #cbd5e1;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: none;
+        background: #0f172a;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 15px;
+        background: #2563eb;
+        border: none;
+        color: white;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    a.voltar {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>💻 IvanTech</h3>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/clientes/">👥 Clientes</a>
+    <a href="/fornecedores/">🏢 Fornecedores</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+    <a href="/parcelas/">📅 Parcelas</a>
+    <a href="/despesas/">💸 Despesas</a>
+    <a href="/financeiro/">💰 Financeiro</a>
+</div>
+
+<div class="content">
+
+    <div class="card">
+        <h2>📥 Nova Compra</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Nome do Produto</label>
+            <input type="text" name="nome" placeholder="Ex: Camisa, Arroz, Cimento" required>
+
+            <label>Quantidade</label>
+            <input type="number" name="quantidade" min="1" required>
+
+            <label>Fornecedor</label>
+            <select name="fornecedor">
+                <option value="">Selecione um fornecedor</option>
+
+                {% for fornecedor in fornecedores %}
+                    <option value="{{ fornecedor.id }}">
+                        {{ fornecedor.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label>Preço de Compra (Custo)</label>
+            <input type="text" name="preco_custo" placeholder="Ex: 25.00" required>
+
+            <label>Preço de Revenda</label>
+            <input type="text" name="preco_venda" placeholder="Ex: 45.00" required>
+
+            <label>Estoque Mínimo</label>
+            <input type="number" name="estoque_minimo" value="5">
+
+            <button type="submit">Salvar Compra</button>
+        </form>
+
+        <a href="/estoque/" class="voltar">Voltar para Estoque</a>
+    </div>
+
+</div>
+
+</body>
+</html>
