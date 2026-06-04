@@ -113,6 +113,9 @@ EMAIL_HOST_USER = 'contatrabalhoo2015@gmail.com'
 # ⚠️ COLOCA SUA SENHA DE APP AQUI
 EMAIL_HOST_PASSWORD = 'SUA_SENHA_DE_APP_AQUI'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # 💡 MODO TESTE (usa esse se quiser ver no terminal)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
