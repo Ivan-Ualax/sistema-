@@ -75,4 +75,12 @@ urlpatterns = [
     path('notas-fiscais/', views.notas_fiscais),
     path('notas-fiscais/add/', views.adicionar_nota_fiscal),
     path('notas-fiscais/deletar/<int:id>/', views.deletar_nota_fiscal),
+
+
+    # VENDA FIADO
+    path('venda-fiado/', views.vendas_fiado),
+    path('venda-fiado/nova/', views.criar_venda_fiado),
+    path('venda-fiado/<int:id>/', views.detalhe_venda_fiado),
+    path('venda-fiado/abater/<int:id>/', views.abater_venda_fiado),
+    path('venda-fiado/excluir/<int:id>/', views.excluir_venda_fiado),
      ]

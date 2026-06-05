@@ -12,6 +12,9 @@ from django.db.models import Sum, F, Q, Value
 from django.db.models.functions import TruncMonth, Replace
 from django.db import transaction
 from django.utils.timezone import now
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+
 
 from datetime import date
 from dateutil.relativedelta import relativedelta  # type: ignore
@@ -20,7 +23,7 @@ import json
 
 from .models import (
     Cliente, Financeiro, Produto, Venda, ItemVenda,
-    Mensagem, Compra, ParcelaVenda, Despesa, Fornecedor, NotaFiscal
+    Mensagem, Compra, ParcelaVenda, Despesa, Fornecedor, NotaFiscal, VendaFiado, PagamentoFiado
 )
 
 
@@ -294,9 +297,9 @@ def cadastrar(request):
     if request.method == 'POST':
         Cliente.objects.create(
             nome=request.POST.get('nome'),
-            cpf=request.POST.get('cpf'),
-            telefone=request.POST.get('telefone'),
-            localizacao=request.POST.get('localizacao'),
+            cpf=request.POST.get('cpf') or None,
+            telefone=request.POST.get('telefone') or None,
+            localizacao=request.POST.get('localizacao') or None,
             status=request.POST.get('status') == 'True'
         )
         return redirect('/clientes/')
@@ -337,7 +340,6 @@ def deletar_cliente(request, id):
     cliente = get_object_or_404(Cliente, id=id)
     cliente.delete()
     return redirect('/clientes/')
-
 
 
 # FINANCEIRO
@@ -459,15 +461,18 @@ def deletar_produto(request, id):
     produto = get_object_or_404(Produto, id=id)
 
     tem_venda = ItemVenda.objects.filter(produto=produto).exists()
-    tem_compra = Compra.objects.filter(produto=produto).exists()
 
-    if tem_venda or tem_compra:
+    if tem_venda:
         return render(request, 'erro_exclusao.html', {
             'mensagem': 'Não é possível apagar este produto.',
-            'detalhe': 'Este produto possui vendas ou compras vinculadas. Para manter o histórico correto, ele não pode ser excluído.'
+            'detalhe': 'Este produto possui vendas vinculadas. Para manter o histórico correto, ele não pode ser excluído.'
         })
 
-    produto.delete()
+    with transaction.atomic():
+        Financeiro.objects.filter(compra__produto=produto).delete()
+        Compra.objects.filter(produto=produto).delete()
+        produto.delete()
+
     return redirect('/estoque/')
 
 
@@ -1188,3 +1193,152 @@ def deletar_nota_fiscal(request, id):
     nota.delete()
 
     return redirect('/notas-fiscais/')
+
+
+# 🤝 VENDA FIADO
+
+def vendas_fiado(request):
+    fiados = VendaFiado.objects.select_related('cliente').order_by('-id')
+
+    total_em_aberto = sum(
+        f.saldo_devedor() for f in fiados if f.status == 'aberta'
+    )
+
+    return render(request, 'vendas_fiado.html', {
+        'fiados': fiados,
+        'total_em_aberto': total_em_aberto
+    })
+
+
+def criar_venda_fiado(request):
+    if request.method == 'POST':
+        cliente = get_object_or_404(Cliente, id=request.POST.get('cliente'))
+        produto = get_object_or_404(Produto, id=request.POST.get('produto'))
+
+        quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
+
+        observacao = request.POST.get('observacao')
+
+        if quantidade <= 0:
+            return HttpResponse("Quantidade inválida")
+
+        with transaction.atomic():
+            produto = Produto.objects.select_for_update().get(id=produto.id)
+
+            if produto.quantidade < quantidade:
+                return HttpResponse("Estoque insuficiente")
+
+            total = produto.preco_venda * quantidade
+            lucro = (produto.preco_venda - produto.preco_custo) * quantidade
+
+            venda = Venda.objects.create(
+                cliente=cliente,
+                total=total,
+                total_com_juros=total,
+                parcelado=False,
+                quantidade_parcelas=1,
+                juros_percentual=0
+            )
+
+            ItemVenda.objects.create(
+                venda=venda,
+                produto=produto,
+                quantidade=quantidade,
+                preco=produto.preco_venda,
+                preco_custo=produto.preco_custo,
+                lucro=lucro
+            )
+
+            produto.quantidade -= quantidade
+            produto.save()
+
+            VendaFiado.objects.create(
+                cliente=cliente,
+                venda=venda,
+                valor_total=total,
+                valor_pago=0,
+                status='aberta',
+                observacao=observacao
+            )
+
+        return redirect('/venda-fiado/')
+
+    return render(request, 'criar_venda_fiado.html', {
+        'clientes': Cliente.objects.filter(status=True).order_by('nome'),
+        'produtos': Produto.objects.all().order_by('nome')
+    })
+
+
+def detalhe_venda_fiado(request, id):
+    fiado = get_object_or_404(VendaFiado, id=id)
+
+    pagamentos = PagamentoFiado.objects.filter(
+        venda_fiado=fiado
+    ).order_by('-id')
+
+    return render(request, 'detalhe_venda_fiado.html', {
+        'fiado': fiado,
+        'pagamentos': pagamentos
+    })
+
+
+def abater_venda_fiado(request, id):
+    fiado = get_object_or_404(VendaFiado, id=id)
+
+    if fiado.status == 'quitada':
+        return redirect(f'/venda-fiado/{fiado.id}/')
+
+    if request.method == 'POST':
+        valor = decimal.Decimal(
+            request.POST.get('valor', '0').replace(',', '.')
+        )
+
+        observacao = request.POST.get('observacao')
+
+        if valor <= 0:
+            return HttpResponse("Valor inválido")
+
+        if valor > fiado.saldo_devedor():
+            return HttpResponse("O valor do abatimento é maior que a dívida.")
+
+        with transaction.atomic():
+            PagamentoFiado.objects.create(
+                venda_fiado=fiado,
+                valor=valor,
+                observacao=observacao
+            )
+
+            fiado.valor_pago += valor
+
+            if fiado.valor_pago >= fiado.valor_total:
+                fiado.status = 'quitada'
+
+            fiado.save()
+
+            Financeiro.objects.create(
+                descricao=f"Abatimento fiado - {fiado.cliente.nome}",
+                valor=valor,
+                tipo='entrada',
+                venda=fiado.venda
+            )
+
+        return redirect(f'/venda-fiado/{fiado.id}/')
+
+    return render(request, 'abater_venda_fiado.html', {
+        'fiado': fiado
+    })
+
+
+@apenas_admin
+def excluir_venda_fiado(request, id):
+    fiado = get_object_or_404(VendaFiado, id=id)
+
+    if fiado.status != 'quitada':
+        return redirect('/venda-fiado/')
+
+    fiado.delete()
+
+    return redirect('/venda-fiado/')
+       

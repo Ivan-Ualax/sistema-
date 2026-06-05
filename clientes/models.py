@@ -3,18 +3,28 @@ from django.core.exceptions import ValidationError
 from datetime import date
 
 
-# 👤 CLIENTE
 class Cliente(models.Model):
     nome = models.CharField(max_length=100)
-    cpf = models.CharField(max_length=14, unique=True)
-    telefone = models.CharField(max_length=15)
-    status = models.BooleanField(default=True)
+
+    cpf = models.CharField(
+        max_length=14,
+        unique=True,
+        blank=True,
+        null=True
+    )
+
+    telefone = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True
+    )
 
     localizacao = models.CharField(
         max_length=200,
         blank=True,
         null=True
     )
+
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -38,9 +48,11 @@ class Fornecedor(models.Model):
 
 
 
+
 # 📦 PRODUTO
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
+
     quantidade = models.IntegerField(default=0)
 
     fornecedor = models.CharField(
@@ -49,7 +61,6 @@ class Produto(models.Model):
         blank=True,
         null=True
     )
-
     fornecedor_cadastro = models.ForeignKey(
         Fornecedor,
         on_delete=models.SET_NULL,
@@ -341,3 +352,46 @@ class Mensagem(models.Model):
 
     def __str__(self):
         return self.nome
+
+# 🤝 VENDA FIADO
+class VendaFiado(models.Model):
+    STATUS_CHOICES = (
+        ('aberta', 'Aberta'),
+        ('quitada', 'Quitada'),
+    )
+
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    venda = models.ForeignKey(Venda, on_delete=models.CASCADE, null=True, blank=True)
+
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
+    valor_pago = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='aberta'
+    )
+
+    data = models.DateField(auto_now_add=True)
+    observacao = models.TextField(blank=True, null=True)
+
+    def saldo_devedor(self):
+        return self.valor_total - self.valor_pago
+
+    def __str__(self):
+        return f"{self.cliente.nome} - R$ {self.saldo_devedor()}"
+
+
+class PagamentoFiado(models.Model):
+    venda_fiado = models.ForeignKey(
+        VendaFiado,
+        on_delete=models.CASCADE,
+        related_name='pagamentos'
+    )
+
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    data = models.DateField(auto_now_add=True)
+    observacao = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Pagamento R$ {self.valor} - {self.venda_fiado.cliente.nome}"

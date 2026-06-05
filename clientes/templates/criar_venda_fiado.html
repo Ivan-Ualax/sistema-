@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Nova Venda Fiado</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.card{
+    max-width:650px;
+    margin:auto;
+    background:#1e293b;
+    padding:30px;
+    border-radius:18px;
+}
+
+h1{
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#cbd5e1;
+    font-weight:bold;
+}
+
+select, input, textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:18px;
+    border-radius:8px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.btn{
+    background:#2563eb;
+    color:white;
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.voltar{
+    display:inline-block;
+    margin-top:15px;
+    color:#38bdf8;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>💳 Nova Venda Fiado</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Cliente</label>
+        <select name="cliente" required>
+            <option value="">Selecione um cliente</option>
+            {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Produto</label>
+        <select name="produto" required>
+            <option value="">Selecione um produto</option>
+            {% for produto in produtos %}
+                <option value="{{ produto.id }}">
+                    {{ produto.nome }} - Estoque: {{ produto.quantidade }} - R$ {{ produto.preco_venda|floatformat:2 }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Quantidade</label>
+        <input type="number" name="quantidade" step="0.001" min="0.001" required>
+
+        <label>Observação</label>
+        <textarea name="observacao" placeholder="Ex: cliente vai pagar aos poucos..."></textarea>
+
+        <button type="submit" class="btn">
+            Salvar Venda Fiado
+        </button>
+    </form>
+
+    <a href="/venda-fiado/" class="voltar">Voltar</a>
+
+</div>
+
+</body>
+</html>

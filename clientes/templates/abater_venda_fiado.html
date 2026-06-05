@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Abater Dívida</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.card{
+    max-width:600px;
+    margin:auto;
+    background:#1e293b;
+    padding:30px;
+    border-radius:18px;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.info{
+    background:#0f172a;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.info p{
+    margin-bottom:8px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    color:#cbd5e1;
+    font-weight:bold;
+}
+
+input, textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:18px;
+    border-radius:8px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.btn{
+    background:#22c55e;
+    color:white;
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.voltar{
+    display:inline-block;
+    margin-top:15px;
+    color:#38bdf8;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>💵 Abater Dívida</h1>
+
+    <div class="info">
+        <p><strong>Cliente:</strong> {{ fiado.cliente.nome }}</p>
+        <p><strong>Valor Total:</strong> R$ {{ fiado.valor_total|floatformat:2 }}</p>
+        <p><strong>Valor Pago:</strong> R$ {{ fiado.valor_pago|floatformat:2 }}</p>
+        <p><strong>Falta Pagar:</strong> R$ {{ fiado.saldo_devedor|floatformat:2 }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Valor do Abatimento</label>
+        <input type="number" name="valor" step="0.01" min="0.01" required>
+
+        <label>Observação</label>
+        <textarea name="observacao" placeholder="Ex: pagamento em dinheiro, pix, parte da dívida..."></textarea>
+
+        <button type="submit" class="btn">
+            Confirmar Abatimento
+        </button>
+    </form>
+
+    <a href="/venda-fiado/{{ fiado.id }}/" class="voltar">Voltar</a>
+
+</div>
+
+</body>
+</html>
