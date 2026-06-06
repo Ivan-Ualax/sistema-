@@ -520,6 +520,12 @@ body::after{
     </div>
 
     <div class="menu-title">GERAL</div>
+    <a href="/pdv/">🧾 PDV</a>
+    <a href="/pdv/vendas/">💳 Vendas PDV</a>
+
+    {% if request.user.is_superuser %}
+
+    <div class="menu-title">GERAL</div>
 
     <a href="/" class="active">🏠 Dashboard</a>
 
@@ -541,7 +547,19 @@ body::after{
 
     <a href="/relatorio/">📊 Relatórios</a>
 
+{% else %}
+
+<div class="menu-title">CAIXA</div>
+
+<a href="/pdv/">🛒 PDV</a>
+<a href="/pdv/vendas/">🧾 Vendas do PDV</a>
+<a href="/venda-fiado/">🤝 Dívidas / Fiado</a>
+
+{% endif %}
+
 </div>
+
+{% if request.user.is_superuser %}
 
 <div class="content">
 
@@ -789,6 +807,35 @@ body::after{
     </div>
 
 </div>
+
+{% else %}
+
+<div class="content">
+
+    <div class="top">
+        <h1>Área do Caixa</h1>
+        <p>Acesso liberado apenas para operações do PDV e recebimentos.</p>
+    </div>
+
+    <div class="buttons">
+
+        <a href="/pdv/" class="blue">
+            🛒 Abrir PDV
+        </a>
+
+        <a href="/pdv/vendas/" class="green">
+            🧾 Vendas do PDV
+        </a>
+
+        <a href="/venda-fiado/" class="lime">
+            🤝 Dívidas / Fiado
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
 
 <script>
 

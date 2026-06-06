@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Fechar Caixa</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.card{
+    max-width:600px;
+    margin:auto;
+    background:#1e293b;
+    padding:30px;
+    border-radius:18px;
+}
+
+.info{
+    background:#0f172a;
+    padding:15px;
+    border-radius:12px;
+    margin:15px 0;
+}
+
+input, textarea{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+    margin:12px 0;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#ef4444;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>🔴 Fechar Caixa</h1>
+
+    <div class="info">
+
+    <p>
+        <strong>📅 Data:</strong>
+        {{ data_hoje|date:"d/m/Y" }}
+    </p>
+
+    <p>
+        <strong>👤 Operador:</strong>
+        {{ operador }}
+    </p>
+
+    <p>
+        <strong>💰 Abertura:</strong>
+        R$ {{ caixa.valor_abertura|floatformat:2 }}
+    </p>
+
+    <p>
+        <strong>🛒 Vendas do Dia:</strong>
+        R$ {{ entradas|floatformat:2 }}
+    </p>
+
+    </div>
+
+    <form method="POST">
+    {% csrf_token %}
+
+    <label>Observação</label>
+    <textarea name="observacao" placeholder="Ex: caixa encerrado normalmente..."></textarea>
+
+    <button type="submit">Fechar Caixa</button>
+    </form>
+</div>
+
+</body>
+</html>

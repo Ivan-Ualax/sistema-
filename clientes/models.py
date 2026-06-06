@@ -53,7 +53,12 @@ class Fornecedor(models.Model):
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
 
-    quantidade = models.IntegerField(default=0)
+   
+    quantidade = models.DecimalField(
+    max_digits=10,
+    decimal_places=3,
+    default=0
+    )
 
     fornecedor = models.CharField(
         max_length=100,
@@ -72,7 +77,11 @@ class Produto(models.Model):
     preco_custo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     preco_venda = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    estoque_minimo = models.IntegerField(default=5)
+    estoque_minimo = models.DecimalField(
+    max_digits=10,
+    decimal_places=3,
+    default=5
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
     data_ultima_compra = models.DateTimeField(null=True, blank=True)
 
@@ -135,6 +144,22 @@ class Venda(models.Model):
     quantidade_parcelas = models.IntegerField(default=1)
     juros_percentual = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
+
+    FORMA_PAGAMENTO_CHOICES = (
+    ('dinheiro', 'Dinheiro'),
+    ('pix', 'Pix'),
+    ('cartao', 'Cartão'),
+    ('fiado', 'Fiado'),
+)
+
+    forma_pagamento = models.CharField(
+    max_length=20,
+    choices=FORMA_PAGAMENTO_CHOICES,
+    blank=True,
+    null=True
+)
+
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -191,7 +216,10 @@ class ItemVenda(models.Model):
     venda = models.ForeignKey(Venda, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
 
-    quantidade = models.IntegerField()
+    quantidade = models.DecimalField(
+    max_digits=10,
+    decimal_places=3
+    )
     preco = models.DecimalField(max_digits=10, decimal_places=2)
 
     preco_custo = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -255,7 +283,10 @@ class Compra(models.Model):
         related_name='compras'
     )
 
-    quantidade = models.IntegerField()
+    quantidade = models.DecimalField(
+    max_digits=10,
+    decimal_places=3
+    )
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     preco_venda = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -395,3 +426,34 @@ class PagamentoFiado(models.Model):
 
     def __str__(self):
         return f"Pagamento R$ {self.valor} - {self.venda_fiado.cliente.nome}"
+    
+# 💰 CAIXA PDV
+class CaixaPDV(models.Model):
+    STATUS_CHOICES = (
+        ('aberto', 'Aberto'),
+        ('fechado', 'Fechado'),
+    )
+
+    usuario = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    data_abertura = models.DateTimeField(auto_now_add=True)
+    data_fechamento = models.DateTimeField(null=True, blank=True)
+
+    valor_abertura = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    valor_fechamento = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='aberto'
+    )
+
+    observacao = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Caixa {self.id} - {self.status}"

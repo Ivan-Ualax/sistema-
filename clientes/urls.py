@@ -83,4 +83,18 @@ urlpatterns = [
     path('venda-fiado/<int:id>/', views.detalhe_venda_fiado),
     path('venda-fiado/abater/<int:id>/', views.abater_venda_fiado),
     path('venda-fiado/excluir/<int:id>/', views.excluir_venda_fiado),
+
+
+    # PDV
+    path('pdv/', views.pdv),
+    path('pdv/vendas/', views.pdv_vendas),
+    path('pdv/abrir-caixa/', views.abrir_caixa),
+    path('pdv/fechar-caixa/', views.fechar_caixa),
+
+
+    path(
+    'pdv/pdf-caixa/',
+    views.pdf_caixa,
+    name='pdf_caixa'
+    ),
      ]

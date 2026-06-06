@@ -14,6 +14,11 @@ from django.db import transaction
 from django.utils.timezone import now
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.contrib import messages
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
 
 
 from datetime import date
@@ -23,10 +28,8 @@ import json
 
 from .models import (
     Cliente, Financeiro, Produto, Venda, ItemVenda,
-    Mensagem, Compra, ParcelaVenda, Despesa, Fornecedor, NotaFiscal, VendaFiado, PagamentoFiado
+    Mensagem, Compra, ParcelaVenda, Despesa, Fornecedor, NotaFiscal, VendaFiado, PagamentoFiado,CaixaPDV
 )
-
-
 
 # DASHBOARD
 
@@ -384,7 +387,6 @@ def deletar_financeiro(request, id):
 
 # ESTOQUE
 
-
 def estoque(request):
     q = request.GET.get('q')
     filtro = request.GET.get('filtro')
@@ -397,16 +399,13 @@ def estoque(request):
 
     if filtro == 'baixo':
         produtos = produtos.filter(quantidade__lte=F('estoque_minimo'))
-
     elif filtro == 'sem':
         produtos = produtos.filter(quantidade__lte=0)
 
     if ordenar == 'nome':
         produtos = produtos.order_by('nome')
-
     elif ordenar == 'quantidade':
         produtos = produtos.order_by('-quantidade')
-
     elif ordenar == 'preco':
         produtos = produtos.order_by('-preco_venda')
 
@@ -421,11 +420,17 @@ def estoque(request):
 def adicionar_produto(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
-        quantidade = int(request.POST.get('quantidade') or 0)
+
+        quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
 
         preco_custo = request.POST.get('preco_custo', '').strip()
         preco_venda = request.POST.get('preco_venda', '').strip()
-        estoque_minimo = request.POST.get('estoque_minimo') or 5
+
+        estoque_minimo = decimal.Decimal(
+            request.POST.get('estoque_minimo', '5').replace(',', '.')
+        )
 
         if preco_custo == '' or preco_venda == '':
             return HttpResponse("Erro: preencha preço de custo e venda")
@@ -435,7 +440,7 @@ def adicionar_produto(request):
             quantidade=quantidade,
             preco_custo=decimal.Decimal(preco_custo.replace(',', '.')),
             preco_venda=decimal.Decimal(preco_venda.replace(',', '.')),
-            estoque_minimo=int(estoque_minimo)
+            estoque_minimo=estoque_minimo
         )
 
         return redirect('/estoque/')
@@ -448,14 +453,29 @@ def editar_produto(request, id):
 
     if request.method == 'POST':
         produto.nome = request.POST.get('nome')
-        produto.quantidade = int(request.POST.get('quantidade') or 0)
-        produto.preco_custo = decimal.Decimal(request.POST.get('preco_custo', '0').replace(',', '.'))
-        produto.preco_venda = decimal.Decimal(request.POST.get('preco_venda', '0').replace(',', '.'))
-        produto.estoque_minimo = int(request.POST.get('estoque_minimo') or 5)
+
+        produto.quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
+
+        produto.preco_custo = decimal.Decimal(
+            request.POST.get('preco_custo', '0').replace(',', '.')
+        )
+
+        produto.preco_venda = decimal.Decimal(
+            request.POST.get('preco_venda', '0').replace(',', '.')
+        )
+
+        produto.estoque_minimo = decimal.Decimal(
+            request.POST.get('estoque_minimo', '5').replace(',', '.')
+        )
+
         produto.save()
         return redirect('/estoque/')
 
     return render(request, 'editar_produto.html', {'produto': produto})
+
+
 @apenas_admin
 def deletar_produto(request, id):
     produto = get_object_or_404(Produto, id=id)
@@ -476,9 +496,7 @@ def deletar_produto(request, id):
     return redirect('/estoque/')
 
 
-
 # COMPRAS
-
 
 def compras(request):
     return render(request, 'compras.html', {
@@ -492,7 +510,10 @@ def adicionar_compra(request):
     if request.method == 'POST':
         nome_produto = request.POST.get('nome')
         fornecedor_id = request.POST.get('fornecedor')
-        quantidade = int(request.POST.get('quantidade') or 0)
+
+        quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
 
         fornecedor_obj = None
         if fornecedor_id:
@@ -508,7 +529,9 @@ def adicionar_compra(request):
             request.POST.get('preco_venda', '0').replace(',', '.')
         )
 
-        estoque_minimo = int(request.POST.get('estoque_minimo') or 5)
+        estoque_minimo = decimal.Decimal(
+            request.POST.get('estoque_minimo', '5').replace(',', '.')
+        )
 
         if not nome_produto:
             return HttpResponse("Nome do produto obrigatório")
@@ -579,9 +602,17 @@ def editar_compra(request, id):
 
         fornecedor_nome = fornecedor_obj.nome if fornecedor_obj else 'Não informado'
 
-        quantidade = int(request.POST.get('quantidade') or 0)
-        preco = decimal.Decimal(request.POST.get('preco', '0').replace(',', '.'))
-        preco_venda = decimal.Decimal(request.POST.get('preco_venda', '0').replace(',', '.'))
+        quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
+
+        preco = decimal.Decimal(
+            request.POST.get('preco', '0').replace(',', '.')
+        )
+
+        preco_venda = decimal.Decimal(
+            request.POST.get('preco_venda', '0').replace(',', '.')
+        )
 
         with transaction.atomic():
             produto = compra.produto
@@ -629,9 +660,7 @@ def deletar_compra(request, id):
 
     return redirect('/compras/')
 
-
 # VENDAS
-
 
 def vendas(request):
     return render(request, 'vendas.html', {
@@ -644,7 +673,10 @@ def criar_venda(request):
         cliente = get_object_or_404(Cliente, id=request.POST.get('cliente'))
         produto_id = request.POST.get('produto')
 
-        quantidade = int(request.POST.get('quantidade') or 0)
+        quantidade = decimal.Decimal(
+            request.POST.get('quantidade', '0').replace(',', '.')
+        )
+
         parcelado = request.POST.get('parcelado') == 'on'
         quantidade_parcelas = int(request.POST.get('quantidade_parcelas') or 1)
 
@@ -720,12 +752,13 @@ def criar_venda(request):
         'clientes': Cliente.objects.all(),
         'produtos': Produto.objects.all()
     })
+
+
 @apenas_admin
 def deletar_venda(request, id):
     venda = get_object_or_404(Venda, id=id)
 
     with transaction.atomic():
-        # Devolve produtos ao estoque
         itens = ItemVenda.objects.filter(venda=venda)
 
         for item in itens:
@@ -733,21 +766,13 @@ def deletar_venda(request, id):
             produto.quantidade += item.quantidade
             produto.save()
 
-        # Apaga financeiro vinculado
         Financeiro.objects.filter(venda=venda).delete()
         Financeiro.objects.filter(parcela__venda=venda).delete()
-
-        # Apaga parcelas
         ParcelaVenda.objects.filter(venda=venda).delete()
-
-        # Apaga itens
         ItemVenda.objects.filter(venda=venda).delete()
-
-        # Apaga venda
         venda.delete()
 
     return redirect('/vendas/')
-
 
 
 # PARCELAS
@@ -1231,7 +1256,10 @@ def criar_venda_fiado(request):
                 return HttpResponse("Estoque insuficiente")
 
             total = produto.preco_venda * quantidade
+            total = total.quantize(decimal.Decimal('0.01'))
+
             lucro = (produto.preco_venda - produto.preco_custo) * quantidade
+            lucro = lucro.quantize(decimal.Decimal('0.01'))
 
             venda = Venda.objects.create(
                 cliente=cliente,
@@ -1239,9 +1267,9 @@ def criar_venda_fiado(request):
                 total_com_juros=total,
                 parcelado=False,
                 quantidade_parcelas=1,
-                juros_percentual=0
+                juros_percentual=0,
+                forma_pagamento='fiado'
             )
-
             ItemVenda.objects.create(
                 venda=venda,
                 produto=produto,
@@ -1341,4 +1369,442 @@ def excluir_venda_fiado(request, id):
     fiado.delete()
 
     return redirect('/venda-fiado/')
-       
+
+# PDV
+
+@login_required
+def pdv(request):
+    caixa_aberto = CaixaPDV.objects.filter(status='aberto').first()
+
+    if request.method == 'POST':
+
+        if not caixa_aberto:
+            return render(request, 'caixa_fechado.html')
+
+        cliente_id = request.POST.get('cliente')
+        cliente_rapido = request.POST.get('cliente_rapido', '').strip()
+        forma_pagamento = request.POST.get('forma_pagamento')
+        carrinho_json = request.POST.get('carrinho', '[]')
+
+        try:
+            carrinho = json.loads(carrinho_json)
+        except:
+            return HttpResponse("Carrinho inválido")
+
+        if not carrinho:
+            return HttpResponse("Carrinho vazio")
+
+        with transaction.atomic():
+
+            if cliente_rapido:
+                cliente = Cliente.objects.create(
+                    nome=cliente_rapido,
+                    cpf=None,
+                    telefone=None,
+                    localizacao=None,
+                    status=True
+                )
+            elif cliente_id:
+                cliente = get_object_or_404(Cliente, id=cliente_id)
+            else:
+                cliente, criado = Cliente.objects.get_or_create(
+                    nome='Consumidor Final',
+                    defaults={
+                        'cpf': None,
+                        'telefone': None,
+                        'localizacao': None,
+                        'status': True
+                    }
+                )
+
+            venda = Venda.objects.create(
+                cliente=cliente,
+                total=0,
+                total_com_juros=0,
+                parcelado=False,
+                quantidade_parcelas=1,
+                juros_percentual=0,
+                forma_pagamento=forma_pagamento
+            )
+
+            total_venda = decimal.Decimal('0.00')
+
+            for item in carrinho:
+                produto_id = item.get('produto_id')
+
+                quantidade = decimal.Decimal(
+                    str(item.get('quantidade', '0')).replace(',', '.')
+                )
+
+                if quantidade <= 0:
+                    return HttpResponse("Quantidade inválida")
+
+                produto = Produto.objects.select_for_update().get(id=produto_id)
+
+                if produto.quantidade < quantidade:
+                    return HttpResponse(
+                        f"Estoque insuficiente para {produto.nome}"
+                    )
+
+                subtotal = produto.preco_venda * quantidade
+                subtotal = subtotal.quantize(decimal.Decimal('0.01'))
+
+                lucro = (produto.preco_venda - produto.preco_custo) * quantidade
+                lucro = lucro.quantize(decimal.Decimal('0.01'))
+
+                ItemVenda.objects.create(
+                    venda=venda,
+                    produto=produto,
+                    quantidade=quantidade,
+                    preco=produto.preco_venda,
+                    preco_custo=produto.preco_custo,
+                    lucro=lucro
+                )
+
+                produto.quantidade -= quantidade
+                produto.save()
+
+                total_venda += subtotal
+
+            total_venda = total_venda.quantize(decimal.Decimal('0.01'))
+
+            venda.total = total_venda
+            venda.total_com_juros = total_venda
+            venda.save()
+
+            if forma_pagamento == 'fiado':
+                VendaFiado.objects.create(
+                    cliente=cliente,
+                    venda=venda,
+                    valor_total=total_venda,
+                    valor_pago=0,
+                    status='aberta',
+                    observacao='Venda realizada pelo PDV'
+                )
+            else:
+                Financeiro.objects.create(
+                    descricao=f"Venda PDV - {forma_pagamento} - {cliente.nome}",
+                    valor=total_venda,
+                    tipo='entrada',
+                    venda=venda
+                )
+
+        return redirect('/pdv/')
+
+    produtos = Produto.objects.all().order_by('nome')
+    clientes = Cliente.objects.filter(status=True).order_by('nome')
+
+    return render(request, 'pdv.html', {
+        'produtos': produtos,
+        'clientes': clientes,
+        'caixa_aberto': caixa_aberto,
+    })
+
+
+@login_required
+def pdv_vendas(request):
+    vendas = Venda.objects.select_related(
+        'cliente'
+    ).prefetch_related(
+        'itemvenda_set__produto'
+    ).order_by('-id')
+
+    return render(request, 'pdv_vendas.html', {
+        'vendas': vendas
+    })
+
+
+@login_required
+def abrir_caixa(request):
+    caixa_aberto = CaixaPDV.objects.filter(status='aberto').first()
+
+    if caixa_aberto:
+        return redirect('/pdv/')
+
+    if request.method == 'POST':
+        valor_abertura = decimal.Decimal(
+            request.POST.get('valor_abertura', '0').replace(',', '.')
+        )
+
+        CaixaPDV.objects.create(
+            usuario=request.user if request.user.is_authenticated else None,
+            valor_abertura=valor_abertura,
+            status='aberto'
+        )
+
+        return redirect('/pdv/')
+
+    return render(request, 'abrir_caixa.html')
+
+
+@login_required
+def fechar_caixa(request):
+    caixa = CaixaPDV.objects.filter(status='aberto').first()
+
+    if not caixa:
+        return redirect('/pdv/')
+
+    hoje = now().date()
+
+    entradas = Financeiro.objects.filter(
+        tipo='entrada',
+        data=hoje
+    ).aggregate(total=Sum('valor'))['total'] or 0
+
+    operador = caixa.usuario.username if caixa.usuario else request.user.username
+
+    if request.method == 'POST':
+        caixa.valor_fechamento = entradas
+        caixa.data_fechamento = now()
+        caixa.status = 'fechado'
+        caixa.observacao = request.POST.get('observacao')
+        caixa.save()
+
+        messages.success(request, "Caixa fechado com sucesso.")
+        return redirect('/pdv/')
+
+    return render(request, 'fechar_caixa.html', {
+        'caixa': caixa,
+        'data_hoje': hoje,
+        'entradas': entradas,
+        'operador': operador,
+    })
+
+
+@login_required
+def pdf_caixa(request):
+    caixa = CaixaPDV.objects.filter(
+        status='fechado'
+    ).order_by('-id').first()
+
+    if not caixa:
+        return HttpResponse(
+            "Nenhum caixa fechado encontrado."
+        )
+
+    data_caixa = caixa.data_fechamento.date()
+
+    vendas = Venda.objects.filter(
+        data__date=data_caixa
+    ).select_related(
+        'cliente'
+    ).order_by('id')
+
+    total_dinheiro = vendas.filter(
+        forma_pagamento='dinheiro'
+    ).aggregate(
+        total=Sum('total')
+    )['total'] or 0
+
+    total_pix = vendas.filter(
+        forma_pagamento='pix'
+    ).aggregate(
+        total=Sum('total')
+    )['total'] or 0
+
+    total_cartao = vendas.filter(
+        forma_pagamento='cartao'
+    ).aggregate(
+        total=Sum('total')
+    )['total'] or 0
+
+    total_fiado = vendas.filter(
+        forma_pagamento='fiado'
+    ).aggregate(
+        total=Sum('total')
+    )['total'] or 0
+
+    total_geral = vendas.aggregate(
+        total=Sum('total')
+    )['total'] or 0
+
+    response = HttpResponse(
+        content_type='application/pdf'
+    )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="caixa_{caixa.id}.pdf"'
+    )
+
+    pdf = canvas.Canvas(
+        response,
+        pagesize=A4
+    )
+
+    y = 800
+
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(
+        180,
+        y,
+        "FECHAMENTO DE CAIXA"
+    )
+
+    y -= 40
+
+    operador = (
+        caixa.usuario.username
+        if caixa.usuario
+        else "Não informado"
+    )
+
+    pdf.setFont("Helvetica", 11)
+
+    pdf.drawString(
+        50,
+        y,
+        f"Data: {caixa.data_fechamento.strftime('%d/%m/%Y')}"
+    )
+
+    y -= 20
+
+    pdf.drawString(
+        50,
+        y,
+        f"Operador: {operador}"
+    )
+
+    y -= 20
+
+    pdf.drawString(
+        50,
+        y,
+        f"Abertura: R$ {caixa.valor_abertura:.2f}"
+    )
+
+    y -= 20
+
+    pdf.drawString(
+        50,
+        y,
+        f"Fechamento: R$ {caixa.valor_fechamento:.2f}"
+    )
+
+    y -= 20
+
+    pdf.drawString(
+        50,
+        y,
+        f"Observação: {caixa.observacao or 'Nenhuma'}"
+    )
+
+    y -= 35
+
+    pdf.setFont("Helvetica-Bold", 13)
+
+    pdf.drawString(
+        50,
+        y,
+        "RESUMO DE PAGAMENTOS"
+    )
+
+    y -= 25
+
+    pdf.setFont("Helvetica", 11)
+
+    pdf.drawString(
+        50,
+        y,
+        f"Dinheiro: R$ {total_dinheiro:.2f}"
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        50,
+        y,
+        f"Pix: R$ {total_pix:.2f}"
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        50,
+        y,
+        f"Cartão: R$ {total_cartao:.2f}"
+    )
+
+    y -= 18
+
+    pdf.drawString(
+        50,
+        y,
+        f"Fiado: R$ {total_fiado:.2f}"
+    )
+
+    y -= 25
+
+    pdf.setFont("Helvetica-Bold", 12)
+
+    pdf.drawString(
+        50,
+        y,
+        f"TOTAL VENDIDO: R$ {total_geral:.2f}"
+    )
+
+    y -= 40
+
+    pdf.setFont("Helvetica-Bold", 13)
+
+    pdf.drawString(
+        50,
+        y,
+        "VENDAS DO DIA"
+    )
+
+    y -= 25
+
+    pdf.setFont("Helvetica-Bold", 10)
+
+    pdf.drawString(50, y, "ID")
+    pdf.drawString(90, y, "CLIENTE")
+    pdf.drawString(300, y, "PAGAMENTO")
+    pdf.drawString(430, y, "TOTAL")
+
+    y -= 15
+
+    pdf.setFont("Helvetica", 10)
+
+    for venda in vendas:
+
+        if y < 70:
+            pdf.showPage()
+            y = 800
+
+        pdf.drawString(
+            50,
+            y,
+            str(venda.id)
+        )
+
+        pdf.drawString(
+            90,
+            y,
+            venda.cliente.nome[:28]
+        )
+
+        pdf.drawString(
+            300,
+            y,
+            venda.forma_pagamento or "-"
+        )
+
+        pdf.drawString(
+            430,
+            y,
+            f"R$ {venda.total:.2f}"
+        )
+
+        y -= 18
+
+    y -= 30
+
+    pdf.drawString(
+        50,
+        y,
+        "Sistema IvanTech ERP"
+    )
+
+    pdf.save()
+
+    return response
