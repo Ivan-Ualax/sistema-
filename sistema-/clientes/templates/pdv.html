@@ -292,6 +292,24 @@ button{
         min-height:180px;
         font-size:40px;
     }
+    .btn-voltar{
+        display:inline-block;
+        margin-bottom:18px;
+        padding:12px 18px;
+        border-radius:12px;
+        background:#1e293b;
+        color:white;
+        text-decoration:none;
+        font-weight:bold;
+        border:1px solid rgba(148,163,184,0.25);
+        cursor:pointer;
+        transition:.2s;
+}
+
+    .btn-voltar:hover{
+        background:#334155;
+        transform:translateX(-3px);
+}
 }
 </style>
 </head>
@@ -301,9 +319,9 @@ button{
 <form method="POST">
     {% csrf_token %}
 
-    <button type="button" class="btn-voltar" onclick="history.back()">
+    <a href="javascript:history.back()" class="btn-voltar">
         ← Voltar
-    </button>
+    </a>
 
     <div class="topo">
         <h1>🛒 PDV</h1>
