@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>IvanTech Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Segoe UI, Arial;
+    background:
+        radial-gradient(circle at top left, rgba(56,189,248,0.10), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(37,99,235,0.12), transparent 30%),
+        linear-gradient(135deg, #020617 0%, #0f172a 100%);
+    color:white;
+    display:flex;
+    overflow-x:hidden;
+    position:relative;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size:40px 40px;
+    z-index:-1;
+    pointer-events:none;
+}
+
+body::after{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    background:rgba(37,99,235,0.15);
+    filter:blur(120px);
+    top:-180px;
+    right:-120px;
+    z-index:-1;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    height:100vh;
+    background:rgba(2,6,23,0.90);
+    backdrop-filter:blur(10px);
+    border-right:1px solid rgba(56,189,248,0.10);
+    padding:20px 15px;
+    position:fixed;
+    overflow-y:auto;
+}
+
+.sidebar::-webkit-scrollbar{
+    width:6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:20px;
+}
+
+.logo{
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.15);
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:20px;
+}
+
+.logo h2{
+    color:#38bdf8;
+    font-size:25px;
+}
+
+.logo p{
+    color:#94a3b8;
+    margin-top:6px;
+    font-size:12px;
+}
+
+.user{
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.10);
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:20px;
+}
+
+.user small{
+    color:#94a3b8;
+}
+
+.logout{
+    display:block;
+    margin-top:12px;
+    text-align:center;
+    padding:10px;
+    background:#dc2626;
+    border-radius:10px;
+    text-decoration:none;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.menu-title{
+    color:#64748b;
+    font-size:11px;
+    margin:20px 0 8px;
+    letter-spacing:1px;
+    font-weight:bold;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color:#cbd5e1;
+    padding:11px 12px;
+    border-radius:10px;
+    margin-bottom:5px;
+    transition:0.2s;
+    font-size:14px;
+}
+
+.sidebar a:hover{
+    background:#1e293b;
+    color:#38bdf8;
+}
+
+.sidebar .active{
+    background:#2563eb;
+    color:white;
+}
+
+/* CONTENT */
+
+.content{
+    margin-left:260px;
+    width:100%;
+    padding:25px;
+}
+
+.top{
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.10);
+    border-radius:22px;
+    padding:24px;
+    margin-bottom:22px;
+    position:relative;
+    overflow:hidden;
+}
+
+.top::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:20px;
+    right:20px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #38bdf8, transparent);
+}
+
+.top h1{
+    font-size:28px;
+}
+
+.top p{
+    color:#94a3b8;
+    margin-top:6px;
+}
+
+/* BOTÕES */
+
+.buttons{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+}
+
+.buttons a{
+    text-decoration:none;
+    color:white;
+    padding:11px 15px;
+    border-radius:12px;
+    font-size:13px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.buttons a:hover{
+    transform:translateY(-2px);
+}
+
+.blue{
+    background:#2563eb;
+}
+
+.green{
+    background:#16a34a;
+}
+
+.red{
+    background:#dc2626;
+}
+
+.lime{
+    background:#65a30d;
+}
+
+/* SECTIONS */
+
+.section{
+    margin-top:25px;
+}
+
+.section h2{
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+    gap:16px;
+}
+
+/* CARDS */
+
+.card{
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.10);
+    border-radius:18px;
+    padding:18px;
+    position:relative;
+    overflow:hidden;
+    transition:0.25s;
+    backdrop-filter:blur(10px);
+    box-shadow:0 10px 30px rgba(0,0,0,0.30);
+}
+
+.card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:15px;
+    right:15px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #38bdf8, transparent);
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:rgba(56,189,248,0.05);
+    top:-40px;
+    right:-40px;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    border-color:rgba(56,189,248,0.35);
+    box-shadow:
+        0 0 25px rgba(56,189,248,0.10),
+        0 15px 40px rgba(0,0,0,0.35);
+}
+
+.card h3{
+    position:relative;
+    z-index:2;
+    font-size:13px;
+    color:#7dd3fc;
+    margin-bottom:10px;
+}
+
+.card p{
+    position:relative;
+    z-index:2;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.card small{
+    position:relative;
+    z-index:2;
+    color:#94a3b8;
+}
+
+/* GRÁFICO COMO ANTES */
+
+.chart-box{
+    margin-top:20px;
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.10);
+    border-radius:22px;
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    height:330px;
+}
+
+.chart-box::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:20px;
+    right:20px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #38bdf8, transparent);
+}
+
+.chart-box h2{
+    margin-bottom:15px;
+}
+
+.chart-box canvas{
+    width:100% !important;
+    height:250px !important;
+}
+
+/* RANKINGS */
+
+.rank{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+    gap:16px;
+}
+
+.rank-card{
+    background:linear-gradient(145deg, rgba(15,23,42,0.96), rgba(17,24,39,0.96));
+    border:1px solid rgba(56,189,248,0.10);
+    border-radius:18px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+    transition:0.25s;
+}
+
+.rank-card:hover{
+    border-color:rgba(56,189,248,0.30);
+    transform:translateY(-4px);
+}
+
+.rank-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:15px;
+    right:15px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #38bdf8, transparent);
+}
+
+.rank-card h3{
+    margin-bottom:15px;
+    color:#93c5fd;
+}
+
+.rank-card ul{
+    padding-left:18px;
+}
+
+.rank-card li{
+    margin-bottom:10px;
+    color:#cbd5e1;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+
+    body{
+        display:block;
+    }
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .content{
+        margin-left:0;
+    }
+    @media(max-width:900px){
+
+    body{
+        display:block;
+    }
+
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .content{
+        margin-left:0;
+        padding:15px;
+    }
+
+    .top{
+        padding:20px;
+    }
+
+    .top h1{
+        font-size:24px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+    .buttons a{
+        width:100%;
+        text-align:center;
+        box-sizing:border-box;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .rank{
+        grid-template-columns:1fr;
+    }
+
+    .chart-box{
+        height:auto;
+        padding:18px;
+    }
+
+    .chart-box canvas{
+        height:220px !important;
+    }
+
+    .card p{
+        font-size:22px;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .sidebar{
+        padding:15px;
+    }
+
+    .logo h2{
+        font-size:22px;
+    }
+
+    .top h1{
+        font-size:22px;
+    }
+
+    .section h2{
+        font-size:18px;
+    }
+
+    .card{
+        padding:16px;
+    }
+
+    .card p{
+        font-size:20px;
+    }
+
+    .rank-card{
+        padding:16px;
+    }
+
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        <h2>IvanTech</h2>
+        <p>Sistema de Gestão Empresarial</p>
+    </div>
+
+    <div class="user">
+        <small>Logado como</small>
+        <h4>{{ request.user.username }}</h4>
+
+        <a href="/logout/" class="logout">
+            Sair
+        </a>
+    </div>
+
+    <div class="menu-title">GERAL</div>
+    <a href="/pdv/">🧾 PDV</a>
+    <a href="/pdv/vendas/">💳 Vendas PDV</a>
+
+    {% if request.user.is_superuser %}
+
+    <div class="menu-title">GERAL</div>
+
+    <a href="/" class="active">🏠 Dashboard</a>
+
+    <div class="menu-title">GESTÃO</div>
+
+    <a href="/clientes/">👥 Clientes</a>
+    <a href="/fornecedores/">🏢 Fornecedores</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+    <a href="/venda-fiado/">🤝 Venda Fiado</a>
+    <a href="/parcelas/">📅 Parcelas</a>
+    <a href="/inadimplencia/">🚨 Inadimplência</a>
+    <a href="/despesas/">💸 Despesas</a>
+    <a href="/financeiro/">💰 Financeiro</a>
+    <a href="/notas-fiscais/">🧾 Notas Fiscais</a>
+
+    <div class="menu-title">RELATÓRIOS</div>
+
+    <a href="/relatorio/">📊 Relatórios</a>
+
+{% else %}
+
+<div class="menu-title">CAIXA</div>
+
+<a href="/pdv/">🛒 PDV</a>
+<a href="/pdv/vendas/">🧾 Vendas do PDV</a>
+<a href="/venda-fiado/">🤝 Dívidas / Fiado</a>
+
+{% endif %}
+
+</div>
+
+{% if request.user.is_superuser %}
+
+<div class="content">
+
+    <div class="top">
+        <h1>Dashboard Geral</h1>
+        <p>Controle completo da empresa em um único sistema.</p>
+    </div>
+
+    <div class="buttons">
+
+        <a href="/relatorio/vendas/pdf/" class="blue">
+            PDF Vendas
+        </a>
+
+        <a href="/relatorio/financeiro/pdf/" class="green">
+            PDF Financeiro
+        </a>
+
+        <a href="/relatorio/inadimplencia/pdf/" class="red">
+            PDF Inadimplência
+        </a>
+
+        <a href="/relatorio/financeiro/excel/" class="lime">
+            Excel Financeiro
+        </a>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Clientes</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Total de Clientes</h3>
+                <p>{{ clientes_total }}</p>
+                <small>Clientes cadastrados</small>
+            </div>
+
+            <div class="card">
+                <h3>Clientes Ativos</h3>
+                <p style="color:#22c55e;">
+                    {{ ativos }}
+                </p>
+                <small>Clientes ativos</small>
+            </div>
+
+            <div class="card">
+                <h3>Clientes Inativos</h3>
+                <p style="color:#f97316;">
+                    {{ inativos }}
+                </p>
+                <small>Clientes inativos</small>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Financeiro</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Entrada</h3>
+                <p style="color:#22c55e;">
+                    R$ {{ entrada|floatformat:2 }}
+                </p>
+                <small>Total recebido</small>
+            </div>
+
+            <div class="card">
+                <h3>Saída</h3>
+                <p style="color:#ef4444;">
+                    R$ {{ saida|floatformat:2 }}
+                </p>
+                <small>Total gasto</small>
+            </div>
+
+            <div class="card">
+                <h3>Compras</h3>
+                <p style="color:#f97316;">
+                    R$ {{ total_compras|floatformat:2 }}
+                </p>
+                <small>Total em compras</small>
+            </div>
+
+            <div class="card">
+                <h3>Despesas</h3>
+                <p style="color:#ef4444;">
+                    R$ {{ total_despesas|floatformat:2 }}
+                </p>
+                <small>Custos operacionais</small>
+            </div>
+
+            <div class="card">
+                <h3>Lucro Bruto</h3>
+
+                {% if lucro_bruto > 0 %}
+                    <p style="color:#22c55e;">
+                {% elif lucro_bruto < 0 %}
+                    <p style="color:#ef4444;">
+                {% else %}
+                    <p style="color:#eab308;">
+                {% endif %}
+                    R$ {{ lucro_bruto|floatformat:2 }}
+                </p>
+
+                <small>Antes das despesas</small>
+            </div>
+
+            <div class="card">
+                <h3>Lucro Líquido</h3>
+
+                {% if lucro_liquido > 0 %}
+                    <p style="color:#22c55e;">
+                {% elif lucro_liquido < 0 %}
+                    <p style="color:#ef4444;">
+                {% else %}
+                    <p style="color:#eab308;">
+                {% endif %}
+                    R$ {{ lucro_liquido|floatformat:2 }}
+                </p>
+
+                <small>Resultado final</small>
+            </div>
+
+            <div class="card">
+                <h3>Saldo</h3>
+                <p style="color:#38bdf8;">
+                    R$ {{ saldo|floatformat:2 }}
+                </p>
+                <small>Saldo atual</small>
+            </div>
+
+            <div class="card">
+                <h3>Parcelas Pendentes</h3>
+                <p>{{ parcelas_pendentes }}</p>
+                <small>Aguardando pagamento</small>
+            </div>
+
+            <div class="card">
+                <h3>Valor a Receber</h3>
+                <p style="color:#38bdf8;">
+                    R$ {{ valor_a_receber|floatformat:2 }}
+                </p>
+                <small>Recebimentos futuros</small>
+            </div>
+
+            <div class="card">
+                <h3>Parcelas Vencidas</h3>
+                <p style="color:#ef4444;">
+                    {{ parcelas_vencidas }}
+                </p>
+                <small>Pagamentos atrasados</small>
+            </div>
+
+            <div class="card">
+                <h3>Clientes Inadimplentes</h3>
+                <p style="color:#f97316;">
+                    {{ inadimplentes }}
+                </p>
+                <small>Clientes em atraso</small>
+            </div>
+
+        </div>
+
+        <div class="chart-box">
+
+            <h2>Entradas e Saídas por Mês</h2>
+
+            <canvas id="lucroChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Rankings</h2>
+
+        <div class="rank">
+
+            <div class="rank-card">
+
+                <h3>Produtos Mais Vendidos</h3>
+
+                <ul>
+
+                    {% for p in top_produtos %}
+                        <li>
+                            {{ p.produto__nome }} - {{ p.total }}
+                        </li>
+                    {% empty %}
+                        <li>Sem vendas registradas</li>
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <div class="rank-card">
+
+                <h3>Melhores Clientes</h3>
+
+                <ul>
+
+                    {% for c in top_clientes %}
+                        <li>
+                            {{ c.cliente__nome }} -
+                            R$ {{ c.total|floatformat:2 }}
+                        </li>
+                    {% empty %}
+                        <li>Sem clientes no ranking</li>
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <div class="rank-card">
+
+                <h3>Ranking de Compras</h3>
+
+                <ul>
+
+                    {% for compra in top_compras %}
+                        <li>
+                            {{ compra.produto__nome }} -
+                            {{ compra.total }} unidades
+                        </li>
+                    {% empty %}
+                        <li>Sem compras registradas</li>
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="content">
+
+    <div class="top">
+        <h1>Área do Caixa</h1>
+        <p>Acesso liberado apenas para operações do PDV e recebimentos.</p>
+    </div>
+
+    <div class="buttons">
+
+        <a href="/pdv/" class="blue">
+            🛒 Abrir PDV
+        </a>
+
+        <a href="/pdv/vendas/" class="green">
+            🧾 Vendas do PDV
+        </a>
+
+        <a href="/venda-fiado/" class="lime">
+            🤝 Dívidas / Fiado
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<script>
+
+const meses = JSON.parse('{{ meses|escapejs }}');
+const entradasMes = JSON.parse('{{ entradas_mes|escapejs }}');
+const saidasMes = JSON.parse('{{ saidas_mes|escapejs }}');
+
+new Chart(document.getElementById('lucroChart'), {
+    type: 'line',
+
+    data: {
+        labels: meses,
+
+        datasets: [
+            {
+                label: 'Entradas',
+                data: entradasMes,
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34,197,94,0.12)',
+                tension: 0.4,
+                fill: true
+            },
+            {
+                label: 'Saídas',
+                data: saidasMes,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239,68,68,0.12)',
+                tension: 0.4,
+                fill: true
+            }
+        ]
+    },
+
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#cbd5e1'
+                }
+            }
+        },
+
+        scales: {
+            x: {
+                ticks: {
+                    color: '#94a3b8'
+                },
+                grid: {
+                    color: '#334155'
+                }
+            },
+
+            y: {
+                ticks: {
+                    color: '#94a3b8'
+                },
+                grid: {
+                    color: '#334155'
+                }
+            }
+        }
+    }
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Estoque</title>
+
+  <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: #020617;
+        height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    .btn {
+        background: #2563eb;
+        padding: 8px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .btn:hover {
+        background: #1d4ed8;
+    }
+
+    .filtros {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        background: #1e293b;
+        padding: 15px;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    .filtros input,
+    .filtros select {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    .filtros input {
+        min-width: 260px;
+    }
+
+    .limpar {
+        padding: 10px 14px;
+        background: #334155;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 10px;
+        overflow: hidden;
+        min-width: 750px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #334155;
+    }
+
+    th {
+        color: #94a3b8;
+        background: #020617;
+    }
+
+    tr:hover {
+        background: #334155;
+    }
+
+    .baixo {
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    .ok {
+        color: #22c55e;
+        font-weight: bold;
+    }
+
+    .sem {
+        color: #f97316;
+        font-weight: bold;
+    }
+
+    .editar {
+        color: #38bdf8;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .editar:hover {
+        color: white;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .filtros {
+            flex-direction: column;
+        }
+
+        .filtros input,
+        .filtros select,
+        .limpar {
+            width: 100%;
+            min-width: auto;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>💻 IvanTech</h3>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/clientes/">📋 Clientes</a>
+    <a href="/financeiro/">💰 Financeiro</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+</div>
+
+<div class="content">
+
+    <div class="top">
+        <h2>📦 Estoque</h2>
+    </div>
+
+    <form method="GET" class="filtros">
+        <input type="text" name="q" placeholder="Buscar produto..." value="{{ q }}">
+
+        <select name="filtro">
+            <option value="">Todos</option>
+            <option value="baixo" {% if filtro == 'baixo' %}selected{% endif %}>Estoque baixo</option>
+            <option value="sem" {% if filtro == 'sem' %}selected{% endif %}>Sem estoque</option>
+        </select>
+
+        <select name="ordenar">
+            <option value="">Ordenar</option>
+            <option value="nome" {% if ordenar == 'nome' %}selected{% endif %}>Nome</option>
+            <option value="quantidade" {% if ordenar == 'quantidade' %}selected{% endif %}>Quantidade</option>
+            <option value="preco" {% if ordenar == 'preco' %}selected{% endif %}>Preço de venda</option>
+        </select>
+
+        <button type="submit" class="btn">Filtrar</button>
+        <a href="/estoque/" class="limpar">Limpar</a>
+    </form>
+
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>Fornecedor</th>
+            <th>Quantidade</th>
+            <th>Custo</th>
+            <th>Venda</th>
+            <th>Última Compra</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for p in produtos %}
+        <tr>
+            <td>{{ p.nome }}</td>
+
+            <td>{{ p.fornecedor_formatado }}</td>
+
+            <td class="{% if p.quantidade <= 0 %}sem{% elif p.quantidade <= p.estoque_minimo %}baixo{% endif %}">
+                {{ p.quantidade }}
+            </td>
+
+            <td>R$ {{ p.preco_custo|floatformat:2 }}</td>
+            <td>R$ {{ p.preco_venda|floatformat:2 }}</td>
+
+            <td>
+                {% if p.data_ultima_compra %}
+                    {{ p.data_ultima_compra|date:"d/m/Y H:i" }}
+                {% else %}
+                    Sem compra
+                {% endif %}
+            </td>
+
+            <td>
+                {% if p.quantidade <= 0 %}
+                    <span class="sem">⛔ Sem estoque</span>
+                {% elif p.quantidade <= p.estoque_minimo %}
+                    <span class="baixo">⚠️ Baixo</span>
+                {% else %}
+                    <span class="ok">✅ OK</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="/estoque/editar/{{ p.id }}/" class="editar">Editar</a>
+
+                {% if request.user.is_superuser %}
+                    <a href="/estoque/deletar/{{ p.id }}/"
+                       onclick="return confirm('Tem certeza que deseja excluir este produto?')">
+                        Excluir
+                    </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">Nenhum produto encontrado.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fornecedores</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        background: #2563eb;
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .btn-voltar {
+        background: #334155;
+    }
+
+    .busca {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    input {
+        padding: 10px;
+        width: 300px;
+        border-radius: 8px;
+        border: none;
+        background: #1e293b;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #22c55e;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 12px;
+        overflow: hidden;
+        min-width: 700px;
+    }
+
+    th,
+    td {
+        padding: 14px;
+        border-bottom: 1px solid #334155;
+        text-align: left;
+    }
+
+    th {
+        background: #020617;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .ativo {
+        color: #22c55e;
+        font-weight: bold;
+    }
+
+    .inativo {
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    .acao {
+        color: #38bdf8;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+    .apagar {
+        color: #ef4444;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .busca {
+            flex-direction: column;
+        }
+
+        input,
+        button {
+            width: 100%;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .acao {
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h2>🏢 Fornecedores</h2>
+
+    <div>
+        <a class="btn btn-voltar" href="/">Voltar</a>
+        <a class="btn" href="/fornecedores/add/">Novo Fornecedor</a>
+    </div>
+</div>
+
+<form method="GET" class="busca">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nome, CNPJ ou telefone">
+    <button type="submit">Buscar</button>
+</form>
+
+<table>
+    <tr>
+        <th>Nome</th>
+        <th>CNPJ</th>
+        <th>Telefone</th>
+        <th>E-mail</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+
+    {% for fornecedor in fornecedores %}
+    <tr>
+        <td>{{ fornecedor.nome }}</td>
+        <td>{{ fornecedor.cnpj|default:"-" }}</td>
+        <td>{{ fornecedor.telefone|default:"-" }}</td>
+        <td>{{ fornecedor.email|default:"-" }}</td>
+
+        <td>
+            {% if fornecedor.ativo %}
+                <span class="ativo">Ativo</span>
+            {% else %}
+                <span class="inativo">Inativo</span>
+            {% endif %}
+        </td>
+
+        <td>
+            <a class="acao" href="/fornecedores/editar/{{ fornecedor.id }}/">Editar</a>
+            <a class="acao apagar" href="/fornecedores/deletar/{{ fornecedor.id }}/">Apagar</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="6">Nenhum fornecedor cadastrado.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

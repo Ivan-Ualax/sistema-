@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Parcela</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: #1e293b;
+            width: 420px;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .info {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-top: 16px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            background: #2563eb;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
+
+        .alerta {
+            background: #78350f;
+            color: #fde68a;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Editar Parcela</h2>
+
+    <div class="info">
+        Venda #{{ parcela.venda.id }} — Cliente: {{ parcela.venda.cliente.nome }}<br>
+        Parcela {{ parcela.numero }}
+    </div>
+
+    <div class="alerta">
+        Atenção: editar parcela não gera entrada no financeiro. Para isso, use a opção de baixar parcela.
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Valor da parcela</label>
+        <input type="text" name="valor" value="{{ parcela.valor|floatformat:2 }}" required>
+
+        <label>Vencimento</label>
+        <input type="date" name="vencimento" value="{{ parcela.vencimento|date:'Y-m-d' }}" required>
+
+        <label>Status</label>
+        <select name="status" required>
+            <option value="pendente" {% if parcela.status == 'pendente' %}selected{% endif %}>Pendente</option>
+            <option value="paga" {% if parcela.status == 'paga' %}selected{% endif %}>Paga</option>
+            <option value="atrasada" {% if parcela.status == 'atrasada' %}selected{% endif %}>Atrasada</option>
+        </select>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+
+    <a href="/parcelas/venda/{{ parcela.venda.id }}/">Voltar</a>
+</div>
+
+</body>
+</html>

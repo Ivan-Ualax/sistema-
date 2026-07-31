@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Financeiro</title>
+
+<style>
+    body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        padding: 20px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: center;
+    }
+
+    a {
+        text-decoration: none;
+        color: white;
+    }
+
+    .btn {
+        background: #22c55e;
+        padding: 10px 15px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    .voltar {
+        background: #334155;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        min-width: 700px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background: #020617;
+    }
+
+    tr:hover {
+        background: #334155;
+    }
+
+    .entrada {
+        color: #22c55e;
+    }
+
+    .saida {
+        color: #ef4444;
+    }
+
+    .acoes a {
+        margin-right: 10px;
+    }
+
+    .editar {
+        color: #38bdf8;
+    }
+
+    .deletar {
+        color: #ef4444;
+    }
+
+    .resumo {
+        margin-top: 20px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 15px;
+        border-radius: 8px;
+        min-width: 180px;
+        box-sizing: border-box;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .acoes a {
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        .resumo {
+            gap: 12px;
+        }
+
+        .card {
+            width: 100%;
+            min-width: auto;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Controle Financeiro</h2>
+
+<div class="topo">
+    <div>
+        <a href="/" class="btn voltar">Voltar</a>
+    </div>
+
+    <div>
+        <a href="/financeiro/add/" class="btn">+ Novo</a>
+    </div>
+</div>
+
+<table>
+    <tr>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Tipo</th>
+        <th>Data</th>
+        <th>Ações</th>
+    </tr>
+
+    {% for r in registros %}
+    <tr>
+        <td>{{ r.descricao }}</td>
+        <td>R$ {{ r.valor }}</td>
+
+        <td class="{% if r.tipo == 'entrada' %}entrada{% else %}saida{% endif %}">
+            {{ r.tipo }}
+        </td>
+
+        <td>{{ r.data }}</td>
+
+        <td class="acoes">
+            <a href="/financeiro/editar/{{ r.id }}/" class="editar">Editar</a>
+
+            <a href="/financeiro/deletar/{{ r.id }}/"
+               class="deletar"
+               onclick="return confirm('Tem certeza que deseja excluir?')">
+               Excluir
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="resumo">
+    <div class="card">
+        <strong>Entradas</strong><br>
+        R$ {{ entrada }}
+    </div>
+
+    <div class="card">
+        <strong>Saídas</strong><br>
+        R$ {{ saida }}
+    </div>
+
+    <div class="card">
+        <strong>Saldo</strong><br>
+        R$ {{ saldo }}
+    </div>
+</div>
+
+</body>
+</html>

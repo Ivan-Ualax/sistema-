@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalhe das Parcelas</title>
+
+    <style>
+    body {
+        background: #0f172a;
+        color: white;
+        font-family: Arial;
+        padding: 30px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .resumo {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .cards {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .mini-card {
+        background: #020617;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        min-width: 160px;
+        box-sizing: border-box;
+    }
+
+    .mini-card span {
+        display: block;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    .mini-card strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 10px;
+        overflow: hidden;
+        min-width: 750px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #334155;
+        text-align: left;
+    }
+
+    th {
+        background: #020617;
+        color: #94a3b8;
+    }
+
+    .pago {
+        color: #22c55e;
+        font-weight: bold;
+    }
+
+    .pendente {
+        color: #f59e0b;
+        font-weight: bold;
+    }
+
+    .atrasado {
+        color: #ef4444;
+        font-weight: bold;
+    }
+
+    .btn-pagar {
+        padding: 6px 10px;
+        background: #2563eb;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-block;
+    }
+
+    .btn-imprimir {
+        padding: 6px 10px;
+        background: #38bdf8;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-block;
+    }
+
+    .voltar {
+        display: inline-block;
+        margin-top: 20px;
+        border: 1px solid #334155;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .voltar:hover {
+        background: #1e293b;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .resumo {
+            padding: 15px;
+        }
+
+        .cards {
+            gap: 10px;
+        }
+
+        .mini-card {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .mini-card strong {
+            font-size: 18px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .btn-pagar,
+        .btn-imprimir {
+            font-size: 13px;
+            padding: 6px 8px;
+        }
+
+        .voltar {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="resumo">
+    <h2>Parcelas da Venda #{{ venda.id }}</h2>
+
+    <p>
+        Cliente: <strong>{{ venda.cliente.nome }}</strong><br>
+        Total: R$ {{ venda.total_com_juros|floatformat:2 }}<br>
+        Parcelas: {{ venda.quantidade_parcelas }}x<br>
+        Juros: {{ venda.juros_percentual }}% ao mês
+    </p>
+
+    <div class="cards">
+        <div class="mini-card">
+            <span>Total Pago</span>
+            <strong style="color:#22c55e;">R$ {{ total_pago|floatformat:2 }}</strong>
+        </div>
+
+        <div class="mini-card">
+            <span>Total Pendente</span>
+            <strong style="color:#f59e0b;">R$ {{ total_pendente|floatformat:2 }}</strong>
+        </div>
+    </div>
+</div>
+
+<table>
+    <tr>
+        <th>Parcela</th>
+        <th>Valor</th>
+        <th>Vencimento</th>
+        <th>Status</th>
+        <th>Data Pagamento</th>
+        <th>Ação</th>
+    </tr>
+
+    {% for p in parcelas %}
+    <tr>
+        <td>{{ p.numero }}</td>
+        <td>R$ {{ p.valor|floatformat:2 }}</td>
+        <td>{{ p.vencimento }}</td>
+
+        <td>
+            {% if p.status == 'paga' %}
+                <span class="pago">Paga</span>
+            {% elif p.vencimento < today %}
+                <span class="atrasado">Atrasada</span>
+            {% else %}
+                <span class="pendente">Pendente</span>
+            {% endif %}
+        </td>
+
+        <td>
+            {% if p.data_pagamento %}
+                {{ p.data_pagamento }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        <td>
+            {% if p.status == 'pendente' or p.status == 'atrasada' %}
+                <a href="/parcelas/pagar/{{ p.id }}/" class="btn-pagar">Pagar</a>
+                <a href="/parcelas/editar/{{ p.id }}/" class="btn-imprimir">Editar</a>
+
+            {% elif p.status == 'paga' %}
+                <a href="/parcelas/imprimir/{{ p.id }}/" class="btn-imprimir">Imprimir</a>
+                <a href="/parcelas/editar/{{ p.id }}/" class="btn-imprimir">Editar</a>
+
+            {% else %}
+                ✔
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/parcelas/" class="voltar">← Voltar</a>
+
+</body>
+</html>

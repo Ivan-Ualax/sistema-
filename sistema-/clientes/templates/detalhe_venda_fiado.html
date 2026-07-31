@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Detalhes da Venda Fiado</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.btn{
+    background:#2563eb;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.btn-green{
+    background:#22c55e;
+}
+
+.card{
+    background:#1e293b;
+    padding:22px;
+    border-radius:16px;
+    margin-bottom:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:15px;
+}
+
+.item{
+    background:#0f172a;
+    padding:15px;
+    border-radius:12px;
+}
+
+.item small{
+    color:#94a3b8;
+}
+
+.item h3{
+    margin-top:6px;
+}
+
+.quitada{
+    color:#22c55e;
+}
+
+.aberta{
+    color:#facc15;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#1e293b;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+th, td{
+    padding:12px;
+    border-bottom:1px solid #334155;
+    text-align:left;
+}
+
+th{
+    background:#0f172a;
+    color:#38bdf8;
+}
+
+@media(max-width:700px){
+
+    body{
+        padding:15px;
+    }
+
+    .topo{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .topo div{
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .btn{
+        width:100%;
+        text-align:center;
+        box-sizing:border-box;
+    }
+
+    .card{
+        width:100%;
+        padding:20px;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    th, td{
+        padding:10px;
+        font-size:13px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    h2{
+        font-size:19px;
+    }
+
+    input, select, textarea{
+        font-size:16px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h1>📋 Detalhes da Venda Fiado</h1>
+
+    <div>
+        <a href="/venda-fiado/" class="btn">Voltar</a>
+
+        {% if fiado.status == 'aberta' %}
+            <a href="/venda-fiado/abater/{{ fiado.id }}/" class="btn btn-green">
+                Abater Dívida
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>{{ fiado.cliente.nome }}</h2>
+
+    {% if fiado.status == 'quitada' %}
+        <p class="quitada">Status: Quitada</p>
+    {% else %}
+        <p class="aberta">Status: Aberta</p>
+    {% endif %}
+
+    {% if fiado.observacao %}
+        <p style="margin-top:10px;color:#cbd5e1;">
+            {{ fiado.observacao }}
+        </p>
+    {% endif %}
+</div>
+
+<div class="grid">
+    <div class="item">
+        <small>Valor Total</small>
+        <h3>R$ {{ fiado.valor_total|floatformat:2 }}</h3>
+    </div>
+
+    <div class="item">
+        <small>Valor Pago</small>
+        <h3>R$ {{ fiado.valor_pago|floatformat:2 }}</h3>
+    </div>
+
+    <div class="item">
+        <small>Falta Pagar</small>
+        <h3>R$ {{ fiado.saldo_devedor|floatformat:2 }}</h3>
+    </div>
+
+    <div class="item">
+        <small>Data</small>
+        <h3>{{ fiado.data|date:"d/m/Y" }}</h3>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Histórico de Abatimentos</h2>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Valor</th>
+            <th>Observação</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for pagamento in pagamentos %}
+        <tr>
+            <td>{{ pagamento.data|date:"d/m/Y" }}</td>
+            <td>R$ {{ pagamento.valor|floatformat:2 }}</td>
+            <td>{{ pagamento.observacao|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">Nenhum abatimento registrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

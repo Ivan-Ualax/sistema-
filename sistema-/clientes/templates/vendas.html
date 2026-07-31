@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vendas</title>
+
+    <style>
+    body {
+        background: #0f172a;
+        font-family: Arial;
+        color: white;
+        padding: 30px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn {
+        background: #22c55e;
+        padding: 10px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        display: inline-block;
+    }
+
+    .btn-excluir {
+        background: #dc2626;
+        padding: 7px 10px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .btn-excluir:hover {
+        background: #b91c1c;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        min-width: 700px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #334155;
+        text-align: left;
+    }
+
+    th {
+        background: #1e293b;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .parcelado {
+        background: #f59e0b;
+        color: #111827;
+    }
+
+    .avista {
+        background: #22c55e;
+        color: white;
+    }
+
+    .voltar {
+        display: inline-block;
+        margin-top: 20px;
+        border: 1px solid #334155;
+        padding: 8px 15px;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .btn-excluir {
+            margin-top: 5px;
+        }
+
+        .voltar {
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h2>Vendas</h2>
+    <a href="/vendas/nova/" class="btn">+ Nova Venda</a>
+</div>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Tipo</th>
+        <th>Valor Produto</th>
+        <th>Total com Juros</th>
+        <th>Parcelas</th>
+        <th>Juros</th>
+        <th>Data</th>
+        <th>Ações</th>
+    </tr>
+
+    {% for v in vendas %}
+    <tr>
+        <td>{{ v.id }}</td>
+
+        <td>{{ v.cliente.nome }}</td>
+
+        <td>
+            {% if v.parcelado %}
+                <span class="badge parcelado">Parcelado</span>
+            {% else %}
+                <span class="badge avista">À vista</span>
+            {% endif %}
+        </td>
+
+        <td>R$ {{ v.total|floatformat:2 }}</td>
+
+        <td>
+            {% if v.parcelado %}
+                R$ {{ v.total_com_juros|floatformat:2 }}
+            {% else %}
+                R$ {{ v.total|floatformat:2 }}
+            {% endif %}
+        </td>
+
+        <td>
+            {% if v.parcelado %}
+                {{ v.quantidade_parcelas }}x
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        <td>
+            {% if v.parcelado %}
+                {{ v.juros_percentual }}% / mês
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        <td>{{ v.data }}</td>
+
+        <td>
+            {% if request.user.is_superuser %}
+                <a href="/vendas/deletar/{{ v.id }}/"
+                   class="btn-excluir"
+                   onclick="return confirm('Tem certeza que deseja excluir esta venda? O estoque será devolvido.')">
+                    Excluir
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/" class="voltar">Voltar</a>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Financeiro</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: linear-gradient(180deg, #020617, #0f172a);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 20px;
+    }
+
+    .menu-title {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 20px;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 12px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        padding: 30px;
+        border-radius: 12px;
+        width: 400px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: none;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #2563eb;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    .back {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .menu-title {
+            margin-top: 15px;
+            font-size: 10px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            padding: 22px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: 16px;
+        }
+
+        button {
+            padding: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>💻 IvanTech</h2>
+
+    <div class="menu-title">GERAL</div>
+    <a href="/">🏠 Início</a>
+
+    <div class="menu-title">GESTÃO</div>
+    <a href="/estoque/">🔩 Produtos</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/clientes/">👤 Clientes</a>
+    <a href="/vendas/">🛒 Vendas</a>
+    <a href="/financeiro/">💰 Caixa</a>
+
+    <div class="menu-title">RELATÓRIOS</div>
+    <a href="/relatorio/">📊 Relatório</a>
+</div>
+
+<div class="content">
+
+    <div class="card">
+        <h2>✏️ Editar Registro</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Descrição</label>
+            <input type="text" name="descricao" value="{{ registro.descricao }}" required>
+
+            <label>Valor</label>
+            <input type="text" name="valor" value="{{ registro.valor }}" required>
+
+            <label>Tipo</label>
+            <select name="tipo">
+                <option value="entrada" {% if registro.tipo == 'entrada' %}selected{% endif %}>Entrada</option>
+                <option value="saida" {% if registro.tipo == 'saida' %}selected{% endif %}>Saída</option>
+            </select>
+
+            <button type="submit">Salvar Alterações</button>
+        </form>
+
+        <a href="/financeiro/" class="back">← Voltar</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

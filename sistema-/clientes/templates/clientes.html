@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clientes</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 230px;
+        height: 100vh;
+        background: #020617;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .logo {
+        margin-bottom: 30px;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 14px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        display: inline-block;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        background: #1e293b;
+        border-collapse: collapse;
+        min-width: 700px;
+    }
+
+    th {
+        background: #020617;
+        padding: 10px;
+        color: #94a3b8;
+        text-align: left;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #334155;
+    }
+
+    .ativo {
+        color: #22c55e;
+    }
+
+    .inativo {
+        color: #ef4444;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="logo">💻 Ivan System</div>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/clientes/">📋 Clientes</a>
+</div>
+
+<div class="content">
+
+    <div class="top">
+        <h2>📋 Clientes</h2>
+
+        <div>
+            <a href="/" class="btn">⬅ Dashboard</a>
+            <a href="/cadastrar/" class="btn">+ Cliente</a>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Status</th>
+        </tr>
+
+        {% for c in clientes %}
+        <tr>
+            <td>{{ c.nome }}</td>
+            <td>{{ c.cpf }}</td>
+            <td>
+                {% if c.status %}
+                    <span class="ativo">Ativo</span>
+                {% else %}
+                    <span class="inativo">Inativo</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>

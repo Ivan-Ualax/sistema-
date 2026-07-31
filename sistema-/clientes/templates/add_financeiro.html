@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Novo Financeiro</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: #020617;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 20px;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    /* CONTEÚDO */
+    .content {
+        flex: 1;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    .form-box {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 400px;
+        box-sizing: border-box;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #cbd5f5;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: none;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    input:focus,
+    select:focus {
+        outline: 2px solid #22c55e;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background: #22c55e;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #16a34a;
+    }
+
+    /* 🔥 BOTÃO VOLTAR COM MOLDURA */
+    .voltar-btn {
+        margin-top: 15px;
+        display: inline-block;
+        padding: 10px;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        color: #94a3b8;
+        text-decoration: none;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .voltar-btn:hover {
+        border-color: #22c55e;
+        color: white;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .form-box {
+            max-width: 100%;
+            width: 100%;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        input,
+        select,
+        button {
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- MENU LATERAL -->
+<div class="sidebar">
+    <h3>IvanTech</h3>
+
+    <a href="/">Dashboard</a>
+    <a href="/clientes/">Clientes</a>
+    <a href="/financeiro/">Financeiro</a>
+    <a href="/estoque/">Estoque</a>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="content">
+
+    <h2>Novo Registro Financeiro</h2>
+
+    <div class="form-box">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label>Descrição</label>
+            <input type="text" name="descricao" placeholder="Ex: Venda, Conta..." required>
+
+            <label>Valor</label>
+            <input type="text" name="valor" placeholder="Ex: 25.50" required>
+
+            <label>Tipo</label>
+            <select name="tipo">
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+            </select>
+
+            <button type="submit">Salvar</button>
+        </form>
+
+        <a href="/financeiro/" class="voltar-btn">Voltar</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

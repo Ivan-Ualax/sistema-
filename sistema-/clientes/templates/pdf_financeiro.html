@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <style>
+    body {
+        font-family: Arial;
+        color: #111827;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #1e3a8a;
+    }
+
+    .info {
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+    .cards {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        width: 30%;
+        padding: 10px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        box-sizing: border-box;
+    }
+
+    .entrada {
+        color: #15803d;
+        font-weight: bold;
+    }
+
+    .saida {
+        color: #b91c1c;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 600px;
+    }
+
+    th {
+        background: #1e293b;
+        color: white;
+        padding: 8px;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid #cbd5e1;
+        padding: 8px;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .info {
+            font-size: 12px;
+        }
+
+        .cards {
+            flex-direction: column;
+        }
+
+        .card {
+            width: 100%;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        th,
+        td {
+            padding: 6px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Relatório Financeiro</h1>
+
+<div class="info">
+    Sistema: IvanTech<br>
+    Gerado em: {{ data_geracao|date:"d/m/Y H:i" }}
+</div>
+
+<div class="cards">
+    <div class="card">
+        <strong>Entradas</strong><br>
+        <span class="entrada">R$ {{ entradas|floatformat:2 }}</span>
+    </div>
+
+    <div class="card">
+        <strong>Saídas</strong><br>
+        <span class="saida">R$ {{ saidas|floatformat:2 }}</span>
+    </div>
+
+    <div class="card">
+        <strong>Saldo</strong><br>
+        R$ {{ saldo|floatformat:2 }}
+    </div>
+</div>
+
+<table>
+    <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+    </tr>
+
+    {% for item in registros %}
+    <tr>
+        <td>{{ item.data|date:"d/m/Y" }}</td>
+        <td>{{ item.descricao }}</td>
+        <td>{{ item.get_tipo_display }}</td>
+        <td>R$ {{ item.valor|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

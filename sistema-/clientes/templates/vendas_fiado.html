@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Venda Fiado</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.btn{
+    background:#2563eb;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#1e293b;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+th, td{
+    padding:12px;
+    border-bottom:1px solid #334155;
+    text-align:left;
+}
+
+th{
+    background:#0f172a;
+    color:#38bdf8;
+}
+
+.aberta{
+    color:#facc15;
+    font-weight:bold;
+}
+
+.quitada{
+    color:#22c55e;
+    font-weight:bold;
+}
+
+.acoes a{
+    color:#38bdf8;
+    text-decoration:none;
+    margin-right:10px;
+
+@media(max-width:700px){
+
+    body{
+        padding:15px;
+    }
+
+    .topo{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .topo div{
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .btn{
+        width:100%;
+        text-align:center;
+        box-sizing:border-box;
+    }
+
+    .card{
+        width:100%;
+        padding:20px;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    th, td{
+        padding:10px;
+        font-size:13px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    h2{
+        font-size:19px;
+    }
+
+    input, select, textarea{
+        font-size:16px;
+    }
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h1>💳 Venda Fiado</h1>
+
+    <div>
+        <a href="/" class="btn">Voltar</a>
+        <a href="/venda-fiado/nova/" class="btn">Nova Venda Fiado</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Total em aberto: R$ {{ total_em_aberto|floatformat:2 }}</h2>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Valor Total</th>
+            <th>Valor Pago</th>
+            <th>Falta Pagar</th>
+            <th>Status</th>
+            <th>Ações</th>
+            <th>Excluir</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for fiado in fiados %}
+        <tr>
+            <td>{{ fiado.cliente.nome }}</td>
+            <td>R$ {{ fiado.valor_total|floatformat:2 }}</td>
+            <td>R$ {{ fiado.valor_pago|floatformat:2 }}</td>
+            <td>R$ {{ fiado.saldo_devedor|floatformat:2 }}</td>
+
+            <td>
+                {% if fiado.status == 'quitada' %}
+                    <span class="quitada">Quitada</span>
+                {% else %}
+                    <span class="aberta">Aberta</span>
+                {% endif %}
+            </td>
+
+            <td class="acoes">
+                <a href="/venda-fiado/{{ fiado.id }}/">
+                    Detalhes
+                </a>
+
+                {% if fiado.status == 'aberta' %}
+                    <a href="/venda-fiado/abater/{{ fiado.id }}/">
+                        Abater
+                    </a>
+                {% endif %}
+
+                {% if fiado.status == 'quitada' %}
+                    <a href="/venda-fiado/excluir/{{ fiado.id }}/"
+                    onclick="return confirm('Deseja excluir esta venda fiado?')"
+                    style="color:#ef4444;font-weight:bold;">
+                        Excluir
+                    </a>
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
