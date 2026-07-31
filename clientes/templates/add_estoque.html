@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Novo Produto</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 240px;
+        height: 100vh;
+        background: linear-gradient(180deg, #020617, #0f172a);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar h3 {
+        margin-bottom: 20px;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        width: 400px;
+        box-sizing: border-box;
+    }
+
+    label {
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 15px;
+        border-radius: 6px;
+        border: none;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #2563eb;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    .back {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            padding: 20px;
+        }
+
+        input,
+        button {
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>💻 IvanTech</h3>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+</div>
+
+<div class="content">
+    <div class="card">
+
+        <h2>📦 Novo Produto</h2>
+
+        <form method="POST" action="/estoque/add/">
+            {% csrf_token %}
+
+            <label>Nome</label>
+            <input type="text" name="nome" required>
+
+            <label>Quantidade</label>
+            <input type="number" name="quantidade" required>
+
+            <label>Preço de Custo</label>
+            <input type="text" name="preco_custo" required>
+
+            <label>Preço de Venda</label>
+            <input type="text" name="preco_venda" required>
+
+            <label>Estoque Mínimo</label>
+            <input type="number" name="estoque_minimo" value="5">
+
+            <button type="submit">Salvar</button>
+        </form>
+
+        <a href="/estoque/" class="back">← Voltar</a>
+
+    </div>
+</div>
+
+</body>
+</html>

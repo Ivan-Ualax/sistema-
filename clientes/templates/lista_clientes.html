@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clientes</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 240px;
+        background: #020617;
+        padding: 20px;
+        height: 100vh;
+        box-sizing: border-box;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .btn {
+        background: #2563eb;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    /* 🔍 BUSCA COMPACTA */
+    .filtro {
+        margin-top: 15px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filtro input {
+        padding: 8px;
+        border-radius: 6px;
+        border: none;
+        background: #1e293b;
+        color: white;
+        width: 200px;
+        box-sizing: border-box;
+    }
+
+    .filtro button {
+        padding: 8px 10px;
+        background: #2563eb;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .limpar {
+        padding: 8px 10px;
+        background: #334155;
+        border-radius: 6px;
+        text-decoration: none;
+        color: white;
+        display: inline-block;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        background: #1e293b;
+        border-collapse: collapse;
+        min-width: 700px;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background: #020617;
+    }
+
+    tr:hover {
+        background: #334155;
+    }
+
+    .ativo {
+        color: #22c55e;
+    }
+
+    .inativo {
+        color: #ef4444;
+    }
+
+    .acoes a {
+        margin-right: 8px;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .filtro {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filtro input,
+        .filtro button,
+        .limpar {
+            width: 100%;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+
+        .acoes a {
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>💻 IvanTech</h3>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/clientes/">📋 Clientes</a>
+    <a href="/clientes/add/">➕ Novo Cliente</a>
+</div>
+
+<div class="content">
+
+    <h2>Clientes</h2>
+
+    <a href="/clientes/add/" class="btn">+ Cliente</a>
+
+    <!-- 🔍 BUSCA -->
+    <form method="GET" class="filtro">
+        <input 
+            type="text" 
+            name="q" 
+            placeholder="Nome/CPF" 
+            value="{{ q }}"
+        >
+
+        <button type="submit">🔍</button>
+
+        <a href="/clientes/" class="limpar">✖</a>
+    </form>
+
+    <table>
+        <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for c in clientes %}
+        <tr>
+            <td>{{ c.nome }}</td>
+
+            <!-- ✔️ CORREÇÃO AQUI -->
+            <td>{{ c.cpf }}</td>
+
+            <td>
+                {% if c.status %}
+                    <span class="ativo">Ativo</span>
+                {% else %}
+                    <span class="inativo">Inativo</span>
+                {% endif %}
+            </td>
+
+            <td class="acoes">
+                <a href="/clientes/editar/{{ c.id }}/">✏️</a>
+                <a href="/clientes/deletar/{{ c.id }}/"
+                   onclick="return confirm('Tem certeza que deseja excluir este cliente?')">
+                   🗑️
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Nenhum cliente encontrado.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>

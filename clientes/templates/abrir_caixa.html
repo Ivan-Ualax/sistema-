@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Abrir Caixa</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:30px;
+}
+
+.card{
+    max-width:500px;
+    margin:auto;
+    background:#1e293b;
+    padding:30px;
+    border-radius:18px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #334155;
+    background:#0f172a;
+    color:white;
+    margin:15px 0;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#22c55e;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>🟢 Abrir Caixa</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Valor Inicial</label>
+        <input type="number" name="valor_abertura" step="0.01" min="0" required>
+
+        <button type="submit">Abrir Caixa</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inadimplência</title>
+
+  <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 260px;
+        height: 100vh;
+        background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+        padding: 24px 18px;
+        border-right: 1px solid #1e293b;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.35);
+        box-sizing: border-box;
+    }
+
+    .logo {
+        margin-bottom: 30px;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(37, 99, 235, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+    .logo h2 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .logo span {
+        display: block;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .menu-title {
+        font-size: 11px;
+        color: #64748b;
+        margin: 22px 0 8px;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #cbd5e1;
+        padding: 12px 14px;
+        text-decoration: none;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        transition: 0.2s;
+        font-size: 14px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+        transform: translateX(4px);
+    }
+
+    .sidebar a.active {
+        background: linear-gradient(90deg, #dc2626, #991b1b);
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 30px;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+
+    .row {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        padding: 18px;
+        border-radius: 12px;
+        width: 220px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        box-sizing: border-box;
+    }
+
+    .card h3 {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0 0 10px;
+    }
+
+    .card p {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1e293b;
+        border-radius: 12px;
+        overflow: hidden;
+        min-width: 750px;
+    }
+
+    th {
+        background: #020617;
+        color: #94a3b8;
+        text-align: left;
+        padding: 14px;
+        font-size: 13px;
+    }
+
+    td {
+        padding: 14px;
+        border-bottom: 1px solid #334155;
+        vertical-align: top;
+    }
+
+    .badge {
+        background: #7f1d1d;
+        color: white;
+        padding: 5px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 9px 12px;
+        background: #22c55e;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .btn:hover {
+        background: #16a34a;
+    }
+
+    .parcelas {
+        color: #cbd5e1;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .empty {
+        background: #1e293b;
+        padding: 30px;
+        border-radius: 12px;
+        color: #94a3b8;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo h2 {
+            font-size: 22px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .sidebar a:hover {
+            transform: none;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .row {
+            gap: 15px;
+        }
+
+        .card {
+            width: 100%;
+        }
+
+        .card p {
+            font-size: 22px;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .empty {
+            padding: 20px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="logo">
+        <h2>💻 IvanTech</h2>
+        <span>Sistema de Gestão Empresarial</span>
+    </div>
+
+    <div style="margin-bottom: 20px; border-bottom: 1px solid #334155; padding-bottom: 15px;">
+        <p style="color:#94a3b8; font-size:13px;">Logado como</p>
+        <strong>{{ request.user.username }}</strong>
+
+        <a href="/logout/" style="display:block; margin-top:10px; padding:8px; background:#ef4444; text-align:center; border-radius:6px; text-decoration:none; color:white;">
+            Sair
+        </a>
+    </div>
+
+    <div class="menu-title">GERAL</div>
+    <a href="/">🏠 Dashboard</a>
+
+    <div class="menu-title">GESTÃO</div>
+    <a href="/clientes/">👥 Clientes</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+    <a href="/parcelas/">📅 Parcelas</a>
+    <a href="/inadimplencia/" class="active">🚨 Inadimplência</a>
+    <a href="/despesas/">💸 Despesas</a>
+    <a href="/financeiro/">💰 Financeiro</a>
+
+    <div class="menu-title">ANÁLISES</div>
+    <a href="/relatorio/">📊 Relatórios</a>
+</div>
+
+<div class="content">
+
+    <h2>🚨 Controle de Inadimplência</h2>
+
+    <div class="row">
+        <div class="card">
+            <h3>Clientes devendo</h3>
+            <p style="color:#f97316;">{{ total_clientes }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Parcelas atrasadas</h3>
+            <p style="color:#ef4444;">{{ total_parcelas }}</p>
+        </div>
+
+        <div class="card">
+            <h3>Total atrasado</h3>
+            <p style="color:#ef4444;">R$ {{ total_atrasado|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    {% if inadimplentes %}
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Quanto deve</th>
+                <th>Dias vencido</th>
+                <th>Parcelas</th>
+                <th>Cobrança</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in inadimplentes %}
+            <tr>
+                <td>
+                    <strong>{{ item.cliente.nome }}</strong><br>
+                    <span style="color:#94a3b8;">CPF: {{ item.cliente.cpf }}</span>
+                </td>
+
+                <td>{{ item.cliente.telefone }}</td>
+
+                <td>
+                    <strong style="color:#ef4444;">
+                        R$ {{ item.total_devido|floatformat:2 }}
+                    </strong>
+                </td>
+
+                <td>
+                    <span class="badge">
+                        {{ item.maior_atraso }} dias
+                    </span>
+                </td>
+
+                <td class="parcelas">
+                    {% for p in item.parcelas %}
+                        Parcela {{ p.parcela.numero }} —
+                        R$ {{ p.parcela.valor|floatformat:2 }} —
+                        {{ p.dias_atraso }} dias<br>
+                    {% endfor %}
+                </td>
+
+                <td>
+                    {% if item.telefone %}
+                        <a class="btn" target="_blank"
+                           href="https://wa.me/{{ item.telefone }}?text={{ item.mensagem_whatsapp }}">
+                            Cobrar no WhatsApp
+                        </a>
+                    {% else %}
+                        <span style="color:#94a3b8;">Sem telefone</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+        <div class="empty">
+            Nenhum cliente inadimplente no momento.
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

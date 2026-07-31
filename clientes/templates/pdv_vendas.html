@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Vendas do PDV</title>
+
+<style>
+body{
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    padding:25px;
+}
+
+.topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.btn{
+    background:#2563eb;
+    color:white;
+    padding:10px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#1e293b;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+th,td{
+    padding:12px;
+    border-bottom:1px solid #334155;
+    text-align:left;
+}
+
+th{
+    background:#0f172a;
+    color:#38bdf8;
+}
+
+@media(max-width:700px){
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h1>🧾 Vendas do PDV</h1>
+    <a href="/pdv/" class="btn">Voltar ao PDV</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Qtd</th>
+            <th>Total</th>
+            <th>Pagamento</th>
+            <th>Data</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for venda in vendas %}
+            {% for item in venda.itemvenda_set.all %}
+            <tr>
+                <td>#{{ venda.id }}</td>
+                <td>{{ venda.cliente.nome }}</td>
+                <td>{{ item.produto.nome }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>R$ {{ venda.total_com_juros|floatformat:2 }}</td>
+                <td>{{ venda.get_forma_pagamento_display|default:"-" }}</td>
+                <td>{{ venda.data|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        {% empty %}
+            <tr>
+                <td colspan="7">Nenhuma venda registrada.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

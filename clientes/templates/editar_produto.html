@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Produto</title>
+
+   <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        display: flex;
+        background: #0f172a;
+        color: white;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: #020617;
+        height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .sidebar a {
+        display: block;
+        color: #94a3b8;
+        padding: 10px;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+    }
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 25px;
+        border-radius: 12px;
+        width: 400px;
+        box-sizing: border-box;
+    }
+
+    label {
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 15px;
+        border-radius: 6px;
+        border: none;
+        background: #020617;
+        color: white;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #2563eb;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .voltar {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+        }
+
+        .sidebar a {
+            padding: 14px 10px;
+            font-size: 15px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            padding: 22px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        input,
+        button {
+            font-size: 16px;
+        }
+
+        button {
+            padding: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h3>💻 IvanTech</h3>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/estoque/">📦 Estoque</a>
+    <a href="/compras/">📥 Compras</a>
+    <a href="/vendas/">🛒 Vendas</a>
+</div>
+
+<div class="content">
+    <div class="card">
+        <h2>✏️ Editar Produto</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Nome do produto</label>
+            <input type="text" name="nome" value="{{ produto.nome }}" required>
+
+            <label>Quantidade</label>
+            <input type="number" name="quantidade" value="{{ produto.quantidade }}" required>
+
+            <label>Preço de Custo</label>
+            <input type="text" name="preco_custo" value="{{ produto.preco_custo }}" required>
+
+            <label>Preço de Venda</label>
+            <input type="text" name="preco_venda" value="{{ produto.preco_venda }}" required>
+
+            <label>Estoque Mínimo</label>
+            <input type="number" name="estoque_minimo" value="{{ produto.estoque_minimo }}" required>
+
+            <button type="submit">Salvar Alterações</button>
+        </form>
+
+        <a href="/estoque/" class="voltar">Voltar</a>
+    </div>
+</div>
+
+</body>
+</html>

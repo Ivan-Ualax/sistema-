@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parcelas</title>
+
+  <style>
+    body {
+        background: #0f172a;
+        color: white;
+        font-family: Arial;
+        padding: 30px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+        border: 1px solid #334155;
+        box-sizing: border-box;
+    }
+
+    .card h3 {
+        margin: 0 0 10px;
+    }
+
+    .info {
+        color: #cbd5e1;
+        margin-bottom: 12px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 12px;
+        background: #2563eb;
+        border-radius: 6px;
+        color: white;
+        text-decoration: none;
+    }
+
+    .excluir {
+        margin-left: 10px;
+        color: #ef4444;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .excluir:hover {
+        color: #f87171;
+    }
+
+    .voltar {
+        display: inline-block;
+        margin-top: 20px;
+        border: 1px solid #334155;
+        padding: 10px 20px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    .voltar:hover {
+        background: #1e293b;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        .topo {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .card {
+            padding: 16px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+        }
+
+        .info {
+            font-size: 14px;
+        }
+
+        .btn,
+        .voltar {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        .excluir {
+            display: inline-block;
+            margin-left: 0;
+            margin-top: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="topo">
+    <h2>Vendas Parceladas</h2>
+</div>
+
+{% for v in vendas %}
+<div class="card">
+    <h3>{{ v.cliente.nome }}</h3>
+
+    <div class="info">
+        Venda #{{ v.id }} |
+        Total: R$ {{ v.total_com_juros|floatformat:2 }} |
+        Parcelas: {{ v.quantidade_parcelas }}x |
+        Juros: {{ v.juros_percentual }}% ao mês
+    </div>
+
+    <a href="/parcelas/venda/{{ v.id }}/" class="btn">Ver parcelas</a>
+
+    <a href="/parcelas/venda/deletar/{{ v.id }}/"
+       class="excluir"
+       onclick="return confirm('Tem certeza que deseja apagar esta venda parcelada?')">
+       Excluir
+    </a>
+</div>
+{% empty %}
+<div class="card">
+    Nenhuma venda parcelada encontrada.
+</div>
+{% endfor %}
+
+<a href="/" class="voltar">← Voltar</a>
+
+</body>
+</html>

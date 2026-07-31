@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+    body {
+        font-family: Arial;
+        color: #111827;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #1e3a8a;
+    }
+
+    .info {
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+    .resumo {
+        background: #e0f2fe;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+        min-width: 600px;
+    }
+
+    th {
+        background: #1e293b;
+        color: white;
+        padding: 8px;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid #cbd5e1;
+        padding: 8px;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+        body {
+            padding: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .info {
+            font-size: 12px;
+        }
+
+        .resumo {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        table {
+            font-size: 11px;
+        }
+
+        th,
+        td {
+            padding: 6px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Relatório de Vendas</h1>
+
+<div class="info">
+    Sistema: IvanTech<br>
+    Gerado em: {{ data_geracao|date:"d/m/Y H:i" }}
+</div>
+
+<div class="resumo">
+    <strong>Total em vendas:</strong> R$ {{ total_vendas|floatformat:2 }}
+</div>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Data</th>
+        <th>Tipo</th>
+        <th>Total</th>
+    </tr>
+
+    {% for venda in vendas %}
+    <tr>
+        <td>#{{ venda.id }}</td>
+        <td>{{ venda.cliente.nome }}</td>
+        <td>{{ venda.data|date:"d/m/Y" }}</td>
+        <td>
+            {% if venda.parcelado %}
+                Parcelada
+            {% else %}
+                À vista
+            {% endif %}
+        </td>
+        <td>R$ {{ venda.total_com_juros|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
